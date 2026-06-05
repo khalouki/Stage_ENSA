@@ -1,0 +1,25 @@
+{
+  "trained_at": "2026-05-09T01:16:05.359456+00:00",
+  "feature_names": [
+    "temperature",
+    "vibration",
+    "usage_hours",
+    "motor_speed",
+    "has_error"
+  ],
+  "labels": [
+    "normal",
+    "monitor",
+    "maintenance_soon",
+    "critical"
+  ],
+  "rows": 1920,
+  "source_files": [
+    "/home/abdo/Desktop/PFE_Projet/backend/data/machine_telemetry_demo.csv",
+    "/home/abdo/Desktop/PFE_Projet/backend/data/generated_machine_telemetry.csv"
+  ],
+  "models": {
+    "anomaly": "IsolationForest",
+    "maintenance": "RandomForestClassifier"
+  }
+}

@@ -1,0 +1,10 @@
+; CNC G2/G3 arc parser smoke sample
+G90
+G21
+G17
+G0 Z5
+G0 X0 Y0
+G1 Z-1 F100
+G2 X10 Y0 I5 J0 F200
+G3 X0 Y0 I-5 J0 F200
+G0 Z5

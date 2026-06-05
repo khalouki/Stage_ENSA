@@ -1,0 +1,512 @@
+\documentclass[12pt,a4paper]{report}
+
+% ─── Encodage & Langue ─────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french,provide=*]{babel}
+\usepackage{lmodern}
+
+% ─── Mathématiques ─────────────────────────────────────────────────
+\usepackage{amsmath, amssymb, amsthm}
+
+% ─── Mise en page ──────────────────────────────────────────────────
+\usepackage{geometry}
+\geometry{
+  top=2.1cm,
+  bottom=2.1cm,
+  left=2.4cm,
+  right=2.1cm,
+  headheight=15pt
+}
+\usepackage{setspace}
+\setstretch{1.5}
+
+% ─── Couleurs ──────────────────────────────────────────────────────
+\usepackage[table]{xcolor}
+\definecolor{ChapterColor}{RGB}{0,70,140}
+\definecolor{SectionColor}{RGB}{0,76,153}
+\definecolor{SubsectionColor}{RGB}{0,90,170}
+\definecolor{SubsubsectionColor}{RGB}{30,110,200}
+\definecolor{RuleColor}{RGB}{0,70,140}
+
+% ─── Titres de sections ────────────────────────────────────────────
+\usepackage{titlesec}
+
+% ── Chapter title: full blank page, vertically & horizontally centered ──
+\newcommand{\chapterbreak}{\clearpage}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering\color{ChapterColor}}
+  {\rule{\textwidth}{1.5pt}\\[0.5cm]
+   \fontsize{14}{16}\selectfont\MakeUppercase{\chaptername}\ \thechapter
+   \\[0.3cm]\rule{\textwidth}{1.5pt}}
+  {0.8cm}
+  {\fontsize{18}{22}\selectfont\MakeUppercase}
+  [\vspace{0.5cm}\rule{\textwidth}{0.5pt}\clearpage]
+
+\titlespacing*{\chapter}{0pt}{8cm}{0pt}
+
+\titleformat{\section}
+  {\color{SectionColor}\normalfont\large\bfseries}
+  {\color{SectionColor}\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{14pt}{6pt}
+
+\titleformat{\subsection}
+  {\color{SubsectionColor}\normalfont\normalsize\bfseries}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+\titleformat{\subsubsection}
+  {\color{SubsubsectionColor}\normalfont\normalsize\bfseries\itshape}
+  {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{3pt}
+
+% ─── Table des matières ────────────────────────────────────────────
+\usepackage{titletoc}
+\usepackage{tocloft}
+
+\renewcommand{\cfttoctitlefont}{\hfill\Large\bfseries\color{ChapterColor}}
+\renewcommand{\cftaftertoctitle}{\hfill\vspace{4pt}\par\noindent\textcolor{RuleColor}{\rule{\textwidth}{1pt}}\vspace{8pt}}
+
+\renewcommand{\cftloftitlefont}{\hfill\Large\bfseries\color{ChapterColor}}
+\renewcommand{\cftafterloftitle}{\hfill\vspace{4pt}\par\noindent\textcolor{RuleColor}{\rule{\textwidth}{1pt}}\vspace{8pt}}
+
+\renewcommand{\cftlottitlefont}{\hfill\Large\bfseries\color{ChapterColor}}
+\renewcommand{\cftafterlottitle}{\hfill\vspace{4pt}\par\noindent\textcolor{RuleColor}{\rule{\textwidth}{1pt}}\vspace{8pt}}
+
+% Chapter entries in TOC
+\renewcommand{\cftchapfont}{\bfseries\color{ChapterColor}}
+\renewcommand{\cftchappagefont}{\bfseries\color{ChapterColor}}
+\renewcommand{\cftchapdotsep}{\cftnodots}
+\setlength{\cftbeforechapskip}{6pt}
+
+% Section entries
+\renewcommand{\cftsecfont}{\small}
+\renewcommand{\cftsecpagefont}{\small}
+\setlength{\cftbeforesecskip}{2pt}
+
+\setlength{\cftsubsecindent}{1.5em}
+\renewcommand{\cftsubsecfont}{\small}
+
+% ─── Tableaux & Figures ────────────────────────────────────────────
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{etoolbox}
+\usepackage[labelfont={bf,color=SectionColor}, textfont=it, margin=10pt]{caption}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Tableau}
+\setlength{\heavyrulewidth}{0.35pt}
+\setlength{\lightrulewidth}{0.18pt}
+\setlength{\cmidrulewidth}{0.18pt}
+\setlength{\arrayrulewidth}{0.2pt}
+\AtBeginEnvironment{table}{%
+  \arrayrulecolor{SectionColor!35}%
+  \rowcolors{2}{gray!5}{white}%
+}
+\AtEndEnvironment{table}{%
+  \rowcolors{2}{}{}%
+  \arrayrulecolor{black}%
+}
+
+% ─── Listes ────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\setlist[itemize,1]{
+  leftmargin=1.2cm,
+  label={\color{SectionColor}\textbullet},
+  labelsep=0.7em,
+  itemsep=0.3em,
+  topsep=0.4em,
+  parsep=0pt
+}
+\setlist[itemize,2]{
+  leftmargin=1cm,
+  label={\color{SubsectionColor}--},
+  itemsep=0.2em,
+  topsep=0.2em
+}
+
+% ─── Boîtes & Cadres ───────────────────────────────────────────────
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+% ─── Graphiques & Hyperliens ───────────────────────────────────────
+\usepackage{graphicx}
+\let\OriginalIncludeGraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{%
+  \tcbox[
+    enhanced,
+    boxrule=0pt,
+    boxsep=0pt,
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt,
+    colback=white,
+    frame hidden,
+    sharp corners,
+    fuzzy halo=0.35mm with black!10
+  ]{\OriginalIncludeGraphics[#1]{#2}}%
+}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks  = true,
+  linkcolor   = ChapterColor,
+  urlcolor    = ChapterColor,
+  citecolor   = ChapterColor,
+  pdfborder   = {0 0 0},
+  pdftitle    = {PFE -- Virtual FabLab},
+  pdfauthor   = {ESSAID ABDELKHALEK},
+  pdfsubject  = {Master D3SI},
+}
+
+% ─── Code Source ───────────────────────────────────────────────────
+\usepackage{listings}
+\usepackage{listingsutf8}
+\usepackage{upquote}
+
+\lstdefinestyle{pythonAcademique}{
+  language        = Python,
+  inputencoding   = utf8,
+  backgroundcolor = \color{gray!5},
+  basicstyle      = \ttfamily\footnotesize,
+  keywordstyle    = \color{blue!70!black}\bfseries,
+  stringstyle     = \color{orange!80!black},
+  commentstyle    = \color{green!40!black}\itshape,
+  numberstyle     = \tiny\color{gray},
+  numbers         = left,
+  stepnumber      = 1,
+  numbersep       = 8pt,
+  frame           = single,
+  rulecolor       = \color{gray!50},
+  breaklines      = true,
+  tabsize         = 4,
+  showstringspaces= false,
+  captionpos      = b,
+  columns         = fullflexible,
+  upquote         = true
+}
+
+% ─── Abréviations ──────────────────────────────────────────────────
+\usepackage[nohyperlinks]{acronym}
+\renewcommand{\acsfont}[1]{\textbf{#1}}
+
+% ─── En-têtes / Pieds de page ──────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+% Left header: current chapter title (dynamic via \leftmark)
+\fancyhead[L]{%
+  \small\color{SectionColor}\nouppercase{\leftmark}%
+}
+% Right header: programme name
+\fancyhead[R]{%
+  \small\color{gray!70!black}\textit{Master D3SI -- 2025/2026}%
+}
+% Footer: page number centred, with decorative rules
+\fancyfoot[C]{%
+  \color{gray!60}\rule{2cm}{0.4pt}\quad
+  \small\thepage
+  \quad\rule{2cm}{0.4pt}%
+}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{{\color{RuleColor}\hrule width\headwidth height 0.5pt}}
+\renewcommand{\footrulewidth}{0pt}
+
+% Plain style (chapter opening pages): only page number, no header
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{%
+    \color{gray!60}\rule{2cm}{0.4pt}\quad
+    \small\thepage
+    \quad\rule{2cm}{0.4pt}%
+  }%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+% Chapter mark: "Chapitre X : Title"
+\renewcommand{\chaptermark}[1]{%
+  \markboth{Chapitre \thechapter{} : #1}{}%
+}
+
+% ─── Macro : chapitre étoilé avec marqueur et TOC ─────────────────
+% Unnumbered chapters that still update the header and TOC
+\newcommand{\chapterstar}[1]{%
+  \chapter*{#1}%
+  \markboth{#1}{#1}%
+  \addcontentsline{toc}{chapter}{#1}%
+}
+
+% ═══════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ─── Page de garde ─────────────────────────────────────────────────
+\newgeometry{hmargin=2cm, top=1.5cm, bottom=1.5cm}
+\begin{titlepage}
+\begin{center}
+
+\begin{tabular}{m{0.25\textwidth} m{0.45\textwidth} m{0.25\textwidth}}
+  \centering\includegraphics[height=2.5cm]{images/univertisé.png} &
+  \centering
+  \begin{minipage}{\linewidth}
+    \centering
+    \text{\small Université Sultan Moulay Slimane}\\[2pt]
+    \text{\small Faculté Polydisciplinaire de Béni Mellal}\\[4pt]
+    \text{Département des technologies nouvelles}
+  \end{minipage} &
+  \centering\includegraphics[height=2.5cm]{images/Faculté.jpg}
+\end{tabular}
+
+\vspace{3mm}
+\textcolor{RuleColor}{\rule{\linewidth}{1.2pt}}
+\vspace{8mm}
+
+{\Large \textsc{Projet de Fin d'Études}}\\[0.3cm]
+{\small Présenté pour l'obtention du diplôme de}\\[0.2cm]
+{\large \textbf{Master en Data Science et Sécurité des Systèmes d'Information}}\\[0.6cm]
+
+\begin{tcolorbox}[
+  colframe=ChapterColor, colback=ChapterColor!5,
+  arc=3pt, boxrule=1.5pt,
+  center title
+]
+  \centering\Large\bfseries\color{ChapterColor}
+  TITRE : Mise en place d’une plateforme de FabLab virtuel intelligent
+en Industrie 4.0
+\end{tcolorbox}
+
+\vspace{0.6cm}
+
+\begin{minipage}[t]{0.45\textwidth}
+  \flushleft
+  \textbf{Présenté par :}\\[4pt]
+  M. \textbf{ESSAID ABDELKHALEK}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+  \flushright
+  \textbf{Sous la direction de :}\\[4pt]
+  Pr. \textbf{Nom et Prénom}
+\end{minipage}
+
+\vspace{0.5cm}
+
+\begin{tcolorbox}[
+  colback=gray!5, colframe=gray!30,
+  arc=5pt, boxrule=0.5pt
+]
+  \begin{minipage}[c]{0.95\textwidth}
+    \flushleft
+    \textbf{Organisme d'accueil :} \textsc{École Nationale des Sciences Appliquées de Béni Mellal}\\[4pt]
+    \textit{Cadre : Projet de Fin d'Études -- Virtual FabLab}
+  \end{minipage}
+\end{tcolorbox}
+
+\vspace{0.5cm}
+
+\begin{flushleft}
+  \textbf{Soutenu le :} \textit{À compléter}\\[4pt]
+  \textbf{Devant le Jury :}\\[0.2cm]
+  \begin{tabular}{ll}
+    Pr. \textbf{Nom Prénom} & FP Béni Mellal \\[3pt]
+    Pr. \textbf{Nom Prénom} & FP Béni Mellal \\[3pt]
+    Pr. \textbf{Nom Prénom} & FP Béni Mellal \\
+  \end{tabular}
+\end{flushleft}
+
+\vfill
+
+\textcolor{gray!50}{\rule{0.3\linewidth}{0.5pt}}\\[0.2cm]
+{\small Faculté Polydisciplinaire -- Université Sultan Moulay Slimane}
+
+\end{center}
+\end{titlepage}
+\restoregeometry
+
+% ─── Pages préliminaires ───────────────────────────────────────────
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ── Remerciements ──────────────────────────────────────────────────
+\chapterstar{Remerciements}
+
+Je tiens à exprimer mes sincères remerciements à mon encadrant pédagogique pour son accompagnement, ses conseils et son suivi tout au long de la réalisation de ce projet de fin d'études.
+
+Je remercie également l'ensemble du corps professoral et administratif de l'ENSA Béni Mellal et de l'Université Sultan Moulay Slimane pour la qualité de la formation reçue durant mon parcours académique.
+
+Enfin, j'adresse mes remerciements à ma famille et à toutes les personnes qui m'ont soutenu directement ou indirectement durant la réalisation de ce travail.
+
+% ── Résumé ────────────────────────────────────────────────────────
+\chapterstar{Résumé}
+
+Ce projet de fin d'études porte sur la conception et le développement d'une plateforme virtuelle de type FabLab intégrant la simulation 3D, l'Internet des Objets et la Data Science. La solution proposée permet de visualiser et de superviser des machines telles qu'une imprimante 3D et une machine CNC dans un environnement interactif.
+
+La plateforme repose sur une architecture moderne combinant une interface web, un backend applicatif, une simulation 3D et un module d'analyse de données. L'objectif est de proposer un environnement numérique permettant la gestion des machines, la simulation de leurs comportements, ainsi que l'exploitation des données générées pour la supervision intelligente et la maintenance prédictive.
+
+\textbf{Mots-clés :} FabLab, Industrie 4.0, Simulation 3D, IoT, MQTT, Data Science, Maintenance prédictive, CNC, Imprimante 3D.
+
+% ── Abstract ──────────────────────────────────────────────────────
+\chapterstar{Abstract}
+
+This final year project focuses on the design and development of a virtual FabLab platform integrating 3D simulation, Internet of Things technologies and Data Science. The proposed solution enables the visualization and supervision of machines such as a 3D printer and a CNC machine within an interactive environment.
+
+The platform is based on a modern architecture combining a web interface, an application backend, a 3D simulation module and a data analysis component. The main objective is to provide a digital environment for machine management, behavior simulation and intelligent data exploitation for monitoring and predictive maintenance.
+
+\textbf{Keywords:} FabLab, Industry 4.0, 3D Simulation, IoT, MQTT, Data Science, Predictive Maintenance, CNC, 3D Printer.
+
+% ── Table des matières ────────────────────────────────────────────
+\clearpage
+\markboth{Table des matières}{Table des matières}
+\tableofcontents
+
+% ── Liste des figures ─────────────────────────────────────────────
+\clearpage
+\markboth{Liste des figures}{Liste des figures}
+\addcontentsline{toc}{chapter}{Liste des figures}
+\listoffigures
+
+% ── Liste des tableaux ────────────────────────────────────────────
+\clearpage
+\markboth{Liste des tableaux}{Liste des tableaux}
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\listoftables
+
+% ── Liste des abréviations ────────────────────────────────────────
+\clearpage
+\chapterstar{Liste des abréviations}
+\begin{acronym}[D3SI]
+  \acro{PFE}{Projet de Fin d'Études}
+  \acro{D3SI}{Data Science et Sécurité des Systèmes d'Information}
+  \acro{ENSA}{École Nationale des Sciences Appliquées}
+  \acro{FPBM}{Faculté Polydisciplinaire de Béni Mellal}
+  \acro{IoT}{Internet des Objets}
+  \acro{MQTT}{Message Queuing Telemetry Transport}
+  \acro{CNC}{Commande Numérique par Calculateur}
+  \acro{IA}{Intelligence Artificielle}
+  \acro{API}{Application Programming Interface}
+  \acro{JWT}{JSON Web Token}
+  \acro{JSON}{JavaScript Object Notation}
+  \acro{REST}{Representational State Transfer}
+  \acro{UI}{User Interface}
+  \acro{UX}{User Experience}
+\end{acronym}
+
+% ─── Introduction générale ─────────────────────────────────────────
+\clearpage
+\chapterstar{Introduction générale}
+
+Les avancées technologiques liées à l'Industrie 4.0 transforment progressivement les environnements de fabrication, d'apprentissage et de prototypage. Les FabLabs représentent aujourd'hui des espaces essentiels pour l'innovation, car ils permettent aux étudiants, chercheurs et porteurs de projets d'accéder à des machines de fabrication numérique telles que les imprimantes 3D et les machines CNC.
+
+Cependant, l'utilisation classique d'un FabLab reste généralement limitée par la présence physique, la disponibilité des machines et l'absence d'outils numériques avancés pour la supervision et l'analyse des données. Dans ce contexte, la mise en place d'une plateforme virtuelle devient une solution pertinente pour améliorer l'accessibilité, la visualisation, la gestion et l'exploitation intelligente des équipements.
+
+Le présent projet vise à concevoir et développer une plateforme virtuelle FabLab intégrant une interface web moderne, une simulation 3D interactive, une communication IoT simulée via MQTT et un module de Data Science destiné à l'analyse des données machines et à la maintenance prédictive.
+
+Ce rapport est organisé comme suit. Le premier chapitre présente l'organisme d'accueil ainsi que le cadre général du projet, la problématique et les objectifs visés. Le deuxième chapitre est consacré à l'analyse des besoins, à la conception du système et aux technologies utilisées. Le troisième chapitre détaille la réalisation et l'implémentation effective de la plateforme. Enfin, le quatrième chapitre présente la validation fonctionnelle, les résultats obtenus, les limites actuelles et les perspectives d'évolution de la solution.
+
+% ─── Corps du document ─────────────────────────────────────────────
+\include{content/chapter1}
+\include{content/chapter2}
+\include{content/chapter3}
+\include{content/chapter4}
+
+% ─── Conclusion générale ──────────────────────────────────────────
+\chapterstar{Conclusion générale}
+
+Ce projet de fin d'études s'inscrit dans le contexte de la transformation numérique des espaces de fabrication, notamment les FabLabs, où l'accès aux machines, la gestion des ressources et la supervision des équipements constituent des enjeux importants. L'objectif principal de ce travail était de concevoir et développer une plateforme web permettant de gérer un FabLab virtuel, de visualiser les machines, de simuler certains comportements de fabrication et de préparer une évolution vers l'intégration de l'IoT et de la Data Science.
+
+La solution développée repose sur une architecture moderne séparant le frontend et le backend. Le frontend, réalisé avec Next.js, assure l'interface utilisateur, la navigation, les pages de gestion, le laboratoire virtuel et les modules de simulation. Le backend, développé avec FastAPI, prend en charge les API REST, l'authentification, la logique métier, la gestion des machines, des utilisateurs et des réservations. La persistance des données est assurée par SQLite, ce qui offre une base simple et adaptée au contexte académique du projet. La plateforme intègre également une simulation 3D permettant de représenter l'environnement du FabLab et de visualiser des machines telles que la CNC et l'imprimante 3D.
+
+Les objectifs fixés au début du projet ont été globalement atteints. Une interface utilisateur fonctionnelle a été réalisée, avec des parcours adaptés aux étudiants et aux administrateurs. La gestion des machines permet d'organiser les équipements du FabLab, tandis que le module de réservation offre la possibilité de demander des créneaux d'utilisation. Les simulations CNC et imprimante 3D apportent une dimension pédagogique à la plateforme en permettant d'observer le principe de fonctionnement des machines numériques. La communication entre le frontend et le backend a été centralisée à travers une fonction d'appel API, ce qui améliore la cohérence des échanges et facilite la maintenance du code. L'architecture modulaire du projet constitue également un point important, car elle permet d'envisager des évolutions futures sans remettre en cause toute la structure existante.
+
+Cependant, certaines limites doivent être soulignées. Les données de télémétrie utilisées dans le projet restent simulées. Elles permettent de valider le principe général de supervision et de préparer les traitements futurs, mais elles ne remplacent pas des mesures réelles issues de capteurs physiques. De plus, la plateforme n'est pas encore connectée à de vraies machines IoT. Les scénarios liés à MQTT, à la supervision et à l'analyse de données restent donc à valider dans un environnement matériel réel. Enfin, la simulation 3D proposée reste une représentation pédagogique : elle ne reproduit pas totalement le comportement physique des machines, notamment les contraintes mécaniques, les vibrations, les erreurs de fabrication ou les effets thermiques.
+
+Plusieurs perspectives peuvent être envisagées pour prolonger ce travail. La première consiste à intégrer une communication MQTT réelle avec des machines ou des microcontrôleurs connectés. L'ajout de capteurs IoT permettrait de collecter des données physiques comme la température, la vibration ou la vitesse de fonctionnement. Ces données pourraient ensuite alimenter un dashboard analytique plus avancé, capable de présenter des courbes, des alertes et des indicateurs de performance. La maintenance prédictive représente également une perspective importante, à condition de disposer d'un historique de données réel et suffisamment riche. Enfin, la simulation pourrait être améliorée afin de devenir plus précise, plus interactive et plus proche du comportement réel des machines de fabrication numérique.
+
+En conclusion, la plateforme Virtual FabLab réalisée dans ce projet constitue une base fonctionnelle et évolutive. Elle montre comment le développement web, la simulation 3D, l'architecture API, l'IoT simulé et la Data Science peuvent être combinés dans un même environnement académique. Même si certaines fonctionnalités restent à approfondir ou à valider avec du matériel réel, le projet atteint son objectif principal : proposer une plateforme numérique capable d'améliorer la gestion, la visualisation et la préparation à la supervision intelligente d'un FabLab.
+
+% ─── Bibliographie et webographie ─────────────────────────────────
+\clearpage
+\renewcommand{\bibname}{Bibliographie et webographie}
+\markboth{Bibliographie et webographie}{Bibliographie et webographie}
+\addcontentsline{toc}{chapter}{Bibliographie et webographie}
+\begin{thebibliography}{99}
+
+\bibitem{Gershenfeld}
+Neil Gershenfeld,
+\textit{Fab: The Coming Revolution on Your Desktop},
+Basic Books, 2005.
+
+\bibitem{Schwab}
+Klaus Schwab,
+\textit{The Fourth Industrial Revolution},
+World Economic Forum, 2016.
+
+\bibitem{IoT}
+Samuel Greengard,
+\textit{The Internet of Things},
+MIT Press, 2015.
+
+\bibitem{ML}
+Aurélien Géron,
+\textit{Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow},
+O'Reilly Media, 2019.
+
+\bibitem{NextjsDocs}
+Vercel,
+\textit{Documentation officielle de Next.js},
+\url{https://nextjs.org/docs},
+consultée le 22 mai 2026.
+
+\bibitem{FastAPIDocs}
+FastAPI,
+\textit{Documentation officielle de FastAPI},
+\url{https://fastapi.tiangolo.com/},
+consultée le 22 mai 2026.
+
+\bibitem{ThreejsDocs}
+Three.js,
+\textit{Documentation officielle de Three.js},
+\url{https://threejs.org/docs/},
+consultée le 22 mai 2026.
+
+\bibitem{MQTTDocs}
+MQTT.org,
+\textit{Documentation et ressources officielles du protocole MQTT},
+\url{https://mqtt.org/},
+consultée le 22 mai 2026.
+
+\bibitem{SQLiteDocs}
+SQLite,
+\textit{Documentation officielle de SQLite},
+\url{https://www.sqlite.org/docs.html},
+consultée le 22 mai 2026.
+
+\bibitem{JWTIntro}
+Auth0,
+\textit{Introduction aux JSON Web Tokens},
+\url{https://jwt.io/introduction},
+consultée le 22 mai 2026.
+
+\bibitem{ScikitLearnDocs}
+Scikit-learn,
+\textit{Documentation officielle de Scikit-learn},
+\url{https://scikit-learn.org/stable/documentation.html},
+consultée le 22 mai 2026.
+
+\bibitem{TailwindDocs}
+Tailwind Labs,
+\textit{Documentation officielle de Tailwind CSS},
+\url{https://tailwindcss.com/docs},
+consultée le 22 mai 2026.
+
+\bibitem{BlenderDocs}
+Blender Foundation,
+\textit{Documentation officielle de Blender},
+\url{https://docs.blender.org/},
+consultée le 22 mai 2026.
+
+\end{thebibliography}
+
+\end{document}
