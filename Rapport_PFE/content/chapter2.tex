@@ -201,34 +201,34 @@ Le module Data Science combine une analyse par règles et des modèles entraîn�
 
 \newcommand{\iotitem}[3]{%
   \subsubsection{#1}
-  \begin{center}
+  \noindent
+  \begin{minipage}[c]{0.22\textwidth}
+    \centering
     \IfFileExists{#2}
-    {\includegraphics[width=0.28\textwidth,height=2.2cm,keepaspectratio]{#2}}
-    {\fbox{\parbox[c][2.2cm][c]{0.28\textwidth}{\centering\scriptsize #1\\\texttt{\detokenize{#2}}}}}
-  \end{center}
-  #3
-  \par\vspace{0.35cm}
+    {\includegraphics[width=0.85\linewidth,height=1.8cm,keepaspectratio]{#2}}
+    {\fbox{\parbox[c][1.8cm][c]{0.85\linewidth}{\centering\scriptsize #1}}}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[c]{0.72\textwidth}
+    #3
+  \end{minipage}
+  \par\vspace{0.4cm}
 }
 
 \subsection{Technologies et équipements IoT}
 
 Cette partie présente les composants matériels et les équipements de fabrication numérique liés à la dimension IoT du FabLab. Ces éléments permettent de relier la plateforme virtuelle à un environnement physique réel, en assurant la collecte de mesures, la communication des données et la supervision des machines.
 
-% TODO: ajouter l'image correspondante dans le dossier images : images/esp8266.png
 \iotitem{ESP8266}{images/esp8266.jpg}{L’ESP8266 est un microcontrôleur doté d’une connectivité Wi-Fi intégrée, largement utilisé dans les applications de l’Internet des Objets. Dans un contexte FabLab, il peut servir d’interface entre les capteurs physiques et la plateforme de supervision. Il permet de collecter des mesures, de les traiter localement puis de les transmettre vers un serveur ou un broker MQTT. Son faible coût et sa facilité de programmation en font un choix adapté aux prototypes académiques et industriels légers.}
 
-% TODO: ajouter l'image correspondante dans le dossier images : images/capteur_temperature.png
 \iotitem{Capteur de température}{images/DHT.jpg}{Le capteur de température permet de mesurer l’échauffement d’un environnement, d’un composant électronique ou d’une machine en fonctionnement. Dans le cadre d’un FabLab intelligent, cette donnée est utile pour surveiller les conditions de travail et prévenir les situations anormales. Une température excessive peut indiquer une surcharge, un défaut de ventilation ou une dégradation progressive d’un équipement. Les mesures collectées peuvent ensuite alimenter des tableaux de bord et des modèles de maintenance prédictive.}
 
-% TODO: ajouter l'image correspondante dans le dossier images : images/capteur_vibration.png
 \iotitem{Capteur de vibration}{images/capteur_vibration.jpg}{Le capteur de vibration mesure les oscillations mécaniques produites par une machine pendant son fonctionnement. Ces données sont essentielles pour les équipements de fabrication numérique, car des vibrations inhabituelles peuvent révéler un désalignement, une usure ou un défaut mécanique. Dans une approche de maintenance préventive, l’analyse de ces signaux aide à identifier les anomalies avant l’apparition d’une panne. Les données de vibration constituent ainsi un indicateur pertinent de l’état de santé des machines.}
 
 \iotitem{Protocole MQTT}{images/mqtt.png}{MQTT est un protocole de messagerie léger basé sur le modèle publication/abonnement. Il est adapté aux systèmes IoT, car il réduit la charge réseau et facilite l’échange de données entre capteurs, microcontrôleurs et applications backend. Dans ce projet, il joue le rôle de canal de communication pour la télémétrie des machines. Les mesures peuvent être publiées sur des topics dédiés, puis consommées par la plateforme afin d’assurer le suivi et l’analyse des équipements.}
 
-% TODO: ajouter l'image correspondante dans le dossier images : images/imprimante_3d.png
-\iotitem{Imprimante 3D}{images/imprimante_3d.webp}{L’imprimante 3D est un équipement de fabrication additive permettant de produire des objets physiques à partir de modèles numériques. Elle fonctionne généralement par dépôt progressif de matière selon des trajectoires définies dans un fichier G-code. Dans un FabLab, elle constitue un outil pédagogique et technique essentiel pour le prototypage rapide. Son intégration à une plateforme IoT permet de suivre son état, sa température, sa progression et ses éventuelles anomalies de fonctionnement.}
+\iotitem{Imprimante 3D}{images/imprimante_3d.png}{L’imprimante 3D est un équipement de fabrication additive permettant de produire des objets physiques à partir de modèles numériques. Elle fonctionne généralement par dépôt progressif de matière selon des trajectoires définies dans un fichier G-code. Dans un FabLab, elle constitue un outil pédagogique et technique essentiel pour le prototypage rapide. Son intégration à une plateforme IoT permet de suivre son état, sa température, sa progression et ses éventuelles anomalies de fonctionnement.}
 
-% TODO: ajouter l'image correspondante dans le dossier images : images/cnc.png
 \iotitem{Machine CNC}{images/cnc.jpg}{La machine CNC est un équipement de fabrication soustractive commandé numériquement. Elle exécute des opérations d’usinage à partir d’instructions précises, souvent décrites dans des fichiers NC ou G-code. Dans un FabLab, elle permet de travailler différents matériaux avec une grande précision. La supervision IoT d’une CNC peut porter sur son état, ses vibrations, sa durée d’utilisation et ses paramètres de fonctionnement afin d’améliorer la sécurité, la traçabilité et la maintenance.}
 
 \section{Conclusion}

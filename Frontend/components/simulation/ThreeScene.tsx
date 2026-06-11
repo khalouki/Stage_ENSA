@@ -1301,7 +1301,13 @@ export function ThreeScene({
 
       tool.position.copy(toolPos);
       tool.visible = true;
-      syncCncMechanics(cncKinematicsRef.current, toolPos, dt);
+      syncCncMechanics(
+        cncKinematicsRef.current,
+        toolPos,
+        dt,
+        false,
+        (anim.moveIdx + t) / Math.max(anim.moves.length - 1, 1),
+      );
       tickPrinterBed(isPrinting);
 
       if (toolLightRef.current) {
@@ -1637,7 +1643,7 @@ export function ThreeScene({
       tool.position.copy(worldPts[0]);
       tool.visible = true;
       syncPrinterMechanics(worldPts[0], 0, true);
-      syncCncMechanics(cncKinematicsRef.current, worldPts[0], 0, true);
+      syncCncMechanics(cncKinematicsRef.current, worldPts[0], 0, true, 0);
     }
 
     fitCameraToBounds(focusBox, 1.4);
@@ -1862,7 +1868,7 @@ export function ThreeScene({
       tabIndex={0}
       onPointerDown={() => mountRef.current?.focus()}
       className="relative h-full w-full outline-none"
-      style={{ background: "#3f3f3f" }}
+      style={{ background: "#f3f4f6" }}
     >
       <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
         <button

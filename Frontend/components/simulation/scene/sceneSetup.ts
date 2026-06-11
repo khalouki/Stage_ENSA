@@ -2,10 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { COLOR_TOOL } from "@/components/simulation/scene/sceneConstants";
 
-const EDITOR_BACKGROUND = 0x3f3f3f;
-const EDITOR_GROUND = 0x3f3f3f;
-const EDITOR_GRID_MAJOR = 0x585858;
-const EDITOR_GRID_MINOR = 0x4a4a4a;
+const EDITOR_BACKGROUND = 0xf3f4f6;
+const EDITOR_GROUND = 0xeff1f4;
+const EDITOR_GRID_MAJOR = 0xc9d0d8;
+const EDITOR_GRID_MINOR = 0xdde2e8;
 
 export type SceneSetupResult = {
   scene: THREE.Scene;

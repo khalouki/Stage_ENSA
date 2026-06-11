@@ -113,9 +113,18 @@ export const fr = {
   loginSubmit: "Se connecter",
   loginNoAccount: "Vous n'avez pas de compte ?",
   loginRegisterNow: "S'inscrire maintenant",
+  loginForgotPassword: "Mot de passe oublié ?",
   loginHeroTitle: "FabLab virtuel",
   loginHeroDescription:
     "Concevez, simulez et créez votre prochain grand projet dans notre espace numérique.",
+  forgotPasswordTitle: "Mot de passe oublié",
+  forgotPasswordDescription:
+    "Saisissez votre adresse Gmail ou votre adresse e-mail pour recevoir un code de réinitialisation.",
+  forgotPasswordSubmit: "Envoyer le code",
+  forgotPasswordBackToLogin: "Retour à la connexion",
+  forgotPasswordHome: "Retour à l'accueil",
+  forgotPasswordUnavailable:
+    "Cette option n’est pas disponible pour le moment. L’envoi de code par Gmail sera ajouté ultérieurement.",
   registerTitle: "Créer un compte",
   registerSubtitle: "Saisissez vos informations pour créer votre profil étudiant.",
   registerHeroTitle: "Rejoignez le Lab.",

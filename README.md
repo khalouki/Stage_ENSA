@@ -1,64 +1,171 @@
-# PFE Projet - FabLab Digital Twin
+# Virtual FabLab - Digital Twin & Industry 4.0 Platform
 
-This project is split into two main folders:
+<p align="center">
+  <img src="Frontend/public/logo.png" alt="FabLab ENSA Beni Mellal logo" width="170">
+</p>
 
-- `backend/`: FastAPI API, database models, telemetry ingestion, MQTT subscriber, AI monitoring, and simulator scripts.
-- `Frontend/`: Next.js web application for users, admins, machines, reservations, simulation, profile, and dashboard views.
+<p align="center">
+  A connected FabLab platform for immersive machine exploration, live telemetry,
+  G-code simulation, reservations, and AI-assisted maintenance monitoring.
+</p>
+
+<p align="center">
+  <strong>Next.js 16</strong> · <strong>FastAPI</strong> · <strong>Three.js</strong> ·
+  <strong>MQTT</strong> · <strong>SQLite</strong> · <strong>Scikit-learn</strong>
+</p>
+
+<p align="center">
+  <img src="Rapport_PFE/images/vue_generale_virtual_fablab.png" alt="Virtual FabLab home page" width="100%">
+</p>
+
+## Overview
+
+Virtual FabLab is a full-stack digital twin platform built for the FabLab at ENSA
+Beni Mellal. It connects users, administrators, machines, and telemetry in one
+web application.
+
+Visitors can explore the virtual lab, students can reserve equipment and test
+G-code, and administrators can supervise machines, reservations, users,
+telemetry, anomalies, and maintenance risks.
+
+## Latest Updates
+
+- Improved CNC 4-axis simulation with synchronized tool-head and workspace motion.
+- Refined CNC movement limits and simulation scene visuals.
+- Added a bilingual forgot-password guidance page linked from login.
+- Expanded English and French interface translations.
+- Added machine-specific simulation controls, G-code validation, live telemetry,
+  progress tracking, speed controls, and camera presets.
+
+> The forgot-password page currently provides user guidance only. Email delivery
+> and secure reset-token endpoints are not implemented yet.
+
+## Features
+
+| Area | Capabilities |
+| --- | --- |
+| Virtual Lab | Interactive 3D FabLab, machine selection, keyboard navigation, and live machine cards |
+| G-code Simulation | Dedicated CNC and 3D-printer scenes, validation, animation, progress, estimates, and speed controls |
+| Machine Monitoring | Live MQTT status, telemetry history, temperature, vibration, motor speed, and machine state |
+| AI & Maintenance | Anomaly detection, machine-health overview, maintenance risk, and recommendations |
+| Reservations | Student booking and cancellation flow plus admin approval and management |
+| Administration | Dashboard, machine catalog, users, reservations, notifications, and role-aware access |
+| User Experience | French/English interface, dark mode, responsive UI, authentication, profile, and password management |
+
+## Gallery
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="Rapport_PFE/images/screenshot_lab_3d.png" alt="Interactive 3D FabLab">
+      <br><strong>Interactive 3D FabLab</strong>
+    </td>
+    <td width="50%">
+      <img src="Rapport_PFE/images/screenshot_dashboard_ds.png" alt="Administrator monitoring dashboard">
+      <br><strong>Administrator Monitoring Dashboard</strong>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="Rapport_PFE/images/screenshot_cnc_simulation.png" alt="CNC G-code simulation">
+      <br><strong>CNC G-code Simulation</strong>
+    </td>
+    <td width="50%">
+      <img src="Rapport_PFE/images/screenshot_printer_simulation.png" alt="3D printer G-code simulation">
+      <br><strong>3D Printer G-code Simulation</strong>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="Rapport_PFE/images/screenshot_reservations.png" alt="Machine reservations">
+      <br><strong>Machine Reservations</strong>
+    </td>
+    <td width="50%">
+      <img src="Rapport_PFE/images/screenshot_prediction_cards.png" alt="AI maintenance predictions">
+      <br><strong>AI Maintenance Predictions</strong>
+    </td>
+  </tr>
+</table>
+
+## Architecture
+
+<p align="center">
+  <img src="Rapport_PFE/images/architecture_generale.png" alt="Virtual FabLab general architecture" width="760">
+</p>
+
+```text
+Browser / Next.js
+        |
+        | REST API
+        v
+FastAPI Backend ------ SQLite
+        |
+        | MQTT subscribe
+        v
+MQTT Broker <--------- Machines / Telemetry Simulator
+        |
+        v
+Telemetry Processing / ML Models / Maintenance Recommendations
+```
+
+The frontend communicates with FastAPI through REST endpoints. The backend
+subscribes to machine telemetry through MQTT, stores operational data in SQLite,
+and exposes monitoring and AI results to the administrator dashboard.
+
+## Tech Stack
+
+**Frontend**
+
+- Next.js 16, React 19, and TypeScript
+- Tailwind CSS 4, shadcn/ui, Radix UI, and Lucide
+- Three.js, React Three Fiber, and Drei
+- Recharts and TanStack Query
+
+**Backend**
+
+- FastAPI, Uvicorn, SQLModel, and Pydantic
+- SQLite and JWT authentication
+- Paho MQTT
+- Pandas, NumPy, Scikit-learn, and Joblib
 
 ## Project Structure
 
 ```text
 PFE_Projet/
-  backend/
-    app/
-      main.py                 FastAPI app entry point
-      db.py                   SQLite database setup and seed data
-      routes/                 API endpoints
-      services/               Business logic and AI/telemetry services
-      schemas/                Pydantic request/response schemas
-      models/                 SQLModel database models
-      core/                   Config and security helpers
-    scripts/
-      mqtt_simulator.py       MQTT telemetry simulator
-      train_ml_models.py      ML model training script
-    ml_models/                Trained model files
-    data/                     Telemetry datasets
-    fablab.db                 Local SQLite database
-    requirements.txt          Python dependencies
-
-  Frontend/
-    app/                      Next.js app routes and pages
-    components/               React components organized by feature
-    lib/                      API helper, schemas, utilities, simulation core
-    hooks/                    Shared React hooks
-    public/                   Images, models, sample G-code files
-    package.json              Frontend scripts and dependencies
+├── backend/
+│   ├── app/
+│   │   ├── core/               Configuration and security
+│   │   ├── models/             SQLModel database models
+│   │   ├── routes/             REST API endpoints
+│   │   ├── schemas/            Request and response schemas
+│   │   └── services/           Auth, MQTT, telemetry, and AI logic
+│   ├── data/                   Telemetry datasets
+│   ├── ml_models/              Trained model files
+│   ├── scripts/                MQTT simulator and ML training
+│   ├── requirements.txt
+│   └── run.py
+├── Frontend/
+│   ├── app/                    Next.js App Router pages
+│   ├── components/             UI, auth, 3D lab, and simulation components
+│   ├── lib/                    API client, translations, and simulation logic
+│   ├── public/models/          CNC and 3D-printer GLB models
+│   ├── public/sample-gcode/    Example G-code and NC programs
+│   └── package.json
+└── Rapport_PFE/
+    ├── content/                Report chapters
+    └── images/                 Diagrams and application screenshots
 ```
 
-## Backend
+## Getting Started
 
-The backend is a FastAPI application. It handles authentication, users, machines, reservations, notifications, MQTT telemetry, anomaly detection, AI monitoring, and maintenance recommendations.
+### Prerequisites
 
-### Main Backend Folders
+- Node.js 20+
+- Python 3.10+
+- npm
+- An MQTT broker such as Mosquitto for live telemetry features
 
-```text
-backend/app/routes/           API route files
-backend/app/services/         Core backend logic
-backend/app/models/           Database models
-backend/app/schemas/          API schemas
-backend/scripts/              Utility scripts and MQTT simulator
-```
-
-Important files:
-
-- `backend/app/main.py`: creates the FastAPI app and registers routes.
-- `backend/app/routes/auth.py`: login, register, profile update, password change.
-- `backend/app/routes/ai.py`: AI monitoring and model endpoints.
-- `backend/app/services/predictive_service.py`: dashboard risk and recommendation logic.
-- `backend/app/services/mqtt_service.py`: MQTT subscriber.
-- `backend/scripts/mqtt_simulator.py`: realistic telemetry publisher.
-
-### Run Backend
+### 1. Start the Backend
 
 ```bash
 cd backend
@@ -68,36 +175,43 @@ pip install -r requirements.txt
 python run.py
 ```
 
-`python run.py` starts the API on all network interfaces. Another PC on the
-same network can reach it by using your computer IP:
+The API starts at [http://localhost:8000](http://localhost:8000), and the
+interactive API documentation is available at
+[http://localhost:8000/docs](http://localhost:8000/docs).
 
-```text
-http://YOUR_PC_IP:8000
+### 2. Start the Frontend
+
+Open a second terminal:
+
+```bash
+cd Frontend
+npm install
+npm run dev
 ```
 
-Default admin account:
+Open [http://localhost:3000](http://localhost:3000).
 
-```text
-email: admin@fablab.local
-password: Admin@123
+### 3. Start Live Telemetry
+
+Start your MQTT broker, then run the included simulator:
+
+```bash
+cd backend
+source .venv/bin/activate
+python3 scripts/mqtt_simulator.py \
+  --broker-host localhost \
+  --broker-port 1883 \
+  --interval 4 \
+  --machines "3D_Printer_1,CNC_1"
 ```
 
-### Run MQTT Simulator
-
-The simulator publishes telemetry to:
+The simulator publishes machine data to:
 
 ```text
 fablab/machines/{machine_id}/data
 ```
 
-Command:
-
-```bash
-cd backend
-python3 scripts/mqtt_simulator.py --broker-host localhost --broker-port 1883 --interval 4 --machines "3D_Printer_1,CNC_1"
-```
-
-Payload fields:
+Example payload:
 
 ```json
 {
@@ -112,139 +226,83 @@ Payload fields:
 }
 ```
 
-## Frontend
+## Configuration
 
-The frontend is a Next.js application using React, TypeScript, Tailwind CSS, shadcn/ui, Radix UI, Lucide icons, and Three.js for 3D views.
-
-### Main Frontend Folders
-
-```text
-Frontend/app/                 Pages and layouts
-Frontend/components/ui/       Reusable UI components
-Frontend/components/layout/   Navbar, footer, app layout
-Frontend/components/auth/     Auth provider and user session
-Frontend/components/profile/  Profile and password forms
-Frontend/components/app-shell/ Theme, splash screen, page transitions
-Frontend/components/3D_design/ Interactive 3D lab
-Frontend/components/simulation/ G-code simulation UI
-Frontend/components/machines/ Machine cards and G-code modal
-Frontend/lib/                 API helper, schemas, utilities
-```
-
-Important files:
-
-- `Frontend/app/layout.tsx`: global layout and providers.
-- `Frontend/app/page.tsx`: home page.
-- `Frontend/app/dashboard/page.tsx`: admin dashboard and recommendations display.
-- `Frontend/app/profile/page.tsx`: user profile page.
-- `Frontend/components/auth/AuthProvider.tsx`: login state and token handling.
-- `Frontend/lib/api.ts`: backend API request helper.
-
-### Run Frontend
-
-```bash
-cd Frontend
-npm install
-npm run dev
-```
-
-Default frontend URL:
-
-```text
-http://localhost:3000
-```
-
-### Backend URL Configuration
-
-The frontend uses this environment variable:
-
-```text
-NEXT_PUBLIC_API_BASE_URL=http://YOUR_PC_IP:8000
-```
-
-If it is not set, the frontend uses the same host as the opened page with port
-`8000`. For example, opening:
-
-```text
-http://192.168.1.20:3000
-```
-
-makes API requests to:
-
-```text
-http://192.168.1.20:8000
-```
-
-Create `Frontend/.env.local` if needed:
+Create `Frontend/.env.local` when the API is running on another host:
 
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://YOUR_PC_IP:8000
 ```
+
+Without this variable, the frontend uses the browser's current hostname with
+port `8000`. This makes it convenient to open the platform from another computer
+on the same network.
+
+Backend defaults are defined in `backend/app/core/config.py`, including the
+database URL, CORS rules, MQTT host, port, and topic pattern.
+
+## Default Admin Account
+
+The backend seeds an administrator when the database is initialized:
+
+```text
+Email:    admin@fablab.ma
+Password: Admin@123
+```
+
+Change these credentials and the default backend secret before any production
+deployment.
 
 ## Main Routes
 
-Frontend routes:
+| Frontend Route | Purpose |
+| --- | --- |
+| `/` | Public home page |
+| `/lab` | Interactive 3D FabLab |
+| `/simulation` | CNC and 3D-printer G-code simulation |
+| `/machines` | Machine catalog |
+| `/machines/[id]` | Machine details and telemetry |
+| `/reservations` | Student reservations |
+| `/admin/reservations` | Admin reservation management |
+| `/dashboard` | AI and telemetry monitoring dashboard |
+| `/users` | Admin user management |
+| `/profile` | User profile and password settings |
+| `/login` | Authentication |
+| `/register` | Account registration |
+| `/forgot-password` | Password recovery guidance |
 
-```text
-/                     Home
-/lab                  Interactive 3D FabLab
-/simulation           G-code simulation
-/machines             Machine list
-/machines/[id]        Machine details
-/reservations         Student reservations
-/admin/reservations   Admin reservation management
-/dashboard            Admin AI monitoring dashboard
-/users                Admin user management
-/profile              User profile
-/login                Login
-/register             Register
-```
-
-Backend API groups:
+Important backend endpoint groups:
 
 ```text
 /auth                 Authentication and profile
-/machines             Machine catalog
+/machines             Machine catalog and state
 /reservations         Student reservations
-/admin                Admin users and reservations
+/admin                Admin users and reservation management
 /notifications        User notifications
 /monitoring           Telemetry and MQTT status
-/admin/ai             AI monitoring and model endpoints
+/simulation           Saved simulation state
+/admin/ai             AI monitoring and model operations
 ```
 
-## Typical Development Workflow
-
-1. Start the backend:
+## Useful Commands
 
 ```bash
+# Frontend
+cd Frontend
+npm run lint
+npm run build
+
+# Backend
 cd backend
 source .venv/bin/activate
 uvicorn app.main:app --reload
-```
-
-2. Start the frontend:
-
-```bash
-cd Frontend
-npm run dev
-```
-
-3. Optional: start MQTT broker and simulator for live telemetry:
-
-```bash
-cd backend
-python3 scripts/mqtt_simulator.py --broker-host localhost --broker-port 1883 --interval 4 --machines "3D_Printer_1,CNC_1"
-```
-
-4. Open the app:
-
-```text
-http://localhost:3000
+python3 scripts/train_ml_models.py
 ```
 
 ## Notes
 
-- The dashboard recommendations are generated by backend AI services and displayed in the frontend dashboard.
-- Telemetry can come from MQTT messages and is stored in the local SQLite database.
-- The frontend keeps authentication tokens in browser local storage.
-- Admin pages require an admin user.
+- Admin pages and AI monitoring endpoints require an administrator account.
+- Authentication tokens are stored in browser local storage.
+- The backend initializes and seeds the local SQLite database automatically.
+- Sample programs are available in `Frontend/public/sample-gcode/`.
+- The report source and additional diagrams are available in `Rapport_PFE/`.

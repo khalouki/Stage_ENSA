@@ -2,6 +2,8 @@ import * as THREE from "three";
 import type { SimulationMove } from "@/lib/simulation";
 import { detectSurfaceReference, type Bounds3, type SurfaceReference } from "@/components/simulation/alignment";
 import {
+  CNC_BED_MAX,
+  CNC_BED_MIN,
   CNC_BED_LOCAL_MOVEMENT,
   CNC_HEAD_LOCAL_MOVEMENT,
   CNC_MOVING_PARTS,
@@ -20,11 +22,8 @@ import {
 const CNC_WORKSPACE_NAME = CNC_MOVING_PARTS.workspace;
 const CNC_FALLBACK_WORKSPACE_NAME = "CNC_WORKSPACE_FALLBACK";
 const CNC_BED_MOTION_GROUP_NAME = "cncBedMotionGroup";
-const CNC_WORKSPACE_MAIN_START_OFFSET = 0.03;
-const CNC_WORKSPACE_MAIN_END_OFFSET = -0.03;
-const CNC_WORKSPACE_MICRO_AMPLITUDE = 0.005;
+const CNC_WORKSPACE_MICRO_AMPLITUDE = 0.001;
 const CNC_WORKSPACE_MICRO_FREQUENCY_HZ = 10;
-const CNC_WORKSPACE_DAMPING = 14;
 
 type PositionedCncPart = {
   key?: string;
@@ -38,7 +37,6 @@ type PositionedCncPart = {
 
 type CncWorkspaceMotionState = {
   elapsedSeconds: number;
-  mainProgress: number;
   offset: number;
 };
 
@@ -263,53 +261,29 @@ function getNormalizedHeadMovement(kinematics: CncKinematics, toolWorldPos: THRE
   return THREE.MathUtils.clamp(t, 0, 1);
 }
 
-function getNormalizedBedMovement(kinematics: CncKinematics, toolWorldPos: THREE.Vector3): number {
-  const { minZ, maxZ } = kinematics.bedMotionWorldBounds;
-  const span = Math.max(maxZ - minZ, 1e-6);
-  const bedT = (toolWorldPos.z - minZ) / span;
-  return THREE.MathUtils.clamp(bedT, 0, 1);
-}
-
-function smoothstep(value: number): number {
-  const t = THREE.MathUtils.clamp(value, 0, 1);
-  return t * t * (3 - 2 * t);
-}
-
-function getDampingBlend(dt: number): number {
-  if (dt <= 0) return 1;
-  return 1 - Math.exp(-CNC_WORKSPACE_DAMPING * dt);
-}
-
 function updateWorkspaceMotion(
   motion: CncWorkspaceMotionState,
-  normalizedProgress: number,
+  progress: number,
   dt: number,
   immediate: boolean,
 ): number {
   if (immediate) {
     motion.elapsedSeconds = 0;
-    motion.mainProgress = 0;
-    motion.offset = CNC_WORKSPACE_MAIN_START_OFFSET;
-    return motion.offset;
+  } else {
+    motion.elapsedSeconds += Math.max(dt, 0);
   }
 
-  motion.elapsedSeconds += Math.max(dt, 0);
-
-  const targetProgress = Math.max(motion.mainProgress, smoothstep(normalizedProgress));
-  const blend = getDampingBlend(dt);
-  motion.mainProgress = THREE.MathUtils.lerp(motion.mainProgress, targetProgress, blend);
-
-  const slowRightToLeftProgress = THREE.MathUtils.lerp(
-    CNC_WORKSPACE_MAIN_START_OFFSET,
-    CNC_WORKSPACE_MAIN_END_OFFSET,
-    motion.mainProgress,
+  const bedProgress = THREE.MathUtils.clamp(progress, 0, 1);
+  const bedPosition = THREE.MathUtils.lerp(
+    CNC_BED_MIN,
+    CNC_BED_MAX,
+    bedProgress,
   );
-  const microOscillation =
-    Math.sin(motion.elapsedSeconds * Math.PI * 2 * CNC_WORKSPACE_MICRO_FREQUENCY_HZ) *
-    CNC_WORKSPACE_MICRO_AMPLITUDE;
-  const targetOffset = slowRightToLeftProgress + microOscillation;
-
-  motion.offset = THREE.MathUtils.lerp(motion.offset, targetOffset, blend);
+  const microOscillation = immediate
+    ? 0
+    : Math.sin(motion.elapsedSeconds * Math.PI * 2 * CNC_WORKSPACE_MICRO_FREQUENCY_HZ) *
+      CNC_WORKSPACE_MICRO_AMPLITUDE;
+  motion.offset = bedPosition + microOscillation;
   return motion.offset;
 }
 
@@ -437,7 +411,6 @@ export function setupCncKinematics(
     bedMotionWorldBounds: computeCncBedMotionWorldBounds(moves, toWorld),
     workspaceMotion: {
       elapsedSeconds: 0,
-      mainProgress: 0,
       offset: 0,
     },
   };
@@ -448,13 +421,12 @@ export function syncCncMechanics(
   toolWorldPos: THREE.Vector3,
   dt: number,
   immediate = false,
-  motionProgress?: number,
+  progress = 0,
 ) {
   if (!kinematics) return;
 
   const t = getNormalizedHeadMovement(kinematics, toolWorldPos);
-  const bedT = motionProgress ?? getNormalizedBedMovement(kinematics, toolWorldPos);
-  const workspaceOffset = updateWorkspaceMotion(kinematics.workspaceMotion, bedT, dt, immediate);
+  const workspaceOffset = updateWorkspaceMotion(kinematics.workspaceMotion, progress, dt, immediate);
 
   for (const part of kinematics.headParts) {
     const offset = THREE.MathUtils.lerp(part.offsetFrom, part.offsetTo, t);

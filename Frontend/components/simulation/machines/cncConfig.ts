@@ -8,6 +8,9 @@ export const CNC_MOVING_PARTS = {
   workspace: "CNC_WORKSPACE",
 } as const;
 
+export const CNC_BED_MIN = -0.08;
+export const CNC_BED_MAX = 0.08;
+
 export const CNC_HEAD_LOCAL_MOVEMENT = [
   {
     name: "CNC_Machine_with_Doors_mesh124",
@@ -40,8 +43,8 @@ export const CNC_BED_LOCAL_MOVEMENT = [
     key: "bedLegs",
     name: "CNC_Machine_with_Doors_mesh16",
     axis: "x",
-    from: -0.17,
-    to: 0.17,
+    from: CNC_BED_MIN,
+    to: CNC_BED_MAX,
   },
   {
     key: "bed",
