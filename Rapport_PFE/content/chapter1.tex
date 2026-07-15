@@ -1,4 +1,4 @@
-\chapter{Présentation de l’organisme d’accueil et cadre général du projet}
+\chapter[Présentation de l’organisme]{Présentation de l’organisme d’accueil et cadre général du projet}
 
 \section{Introduction}
 
@@ -30,17 +30,19 @@ Les missions principales de l’ENSA BM peuvent être résumées comme suit :
 
 \subsection{Formations proposées}
 
-L’établissement propose plusieurs formations orientées vers les sciences appliquées et les technologies modernes. Dans le cadre de ce rapport, l’intérêt porte principalement sur la formation \textbf{Data Science et Sécurité des Systèmes d’Information}, qui couvre des domaines tels que :
+L'École Nationale des Sciences Appliquées de Béni Mellal propose des formations d'ingénieurs orientées vers les sciences appliquées, les technologies et l'ingénierie. Ces formations visent à développer des compétences scientifiques et techniques adaptées aux besoins du monde professionnel.
+
+Les domaines de formation couvrent notamment :
 
 \begin{itemize}
-    \item le développement logiciel et web ;
-    \item la conception des systèmes d’information ;
-    \item la sécurité informatique ;
-    \item l’analyse de données et l’intelligence artificielle ;
-    \item les architectures distribuées et les systèmes connectés.
+    \item l'informatique et les technologies numériques ;
+    \item les systèmes embarqués et connectés ;
+    \item les télécommunications ;
+    \item les systèmes industriels ;
+    \item l'ingénierie et les sciences appliquées.
 \end{itemize}
 
-Ces compétences sont directement mobilisées dans le projet Virtual FabLab, qui combine développement web, simulation 3D, communication IoT et exploitation de données.
+Dans ce contexte technologique, l'ENSA de Béni Mellal constitue un environnement adapté à la réalisation du projet Virtual FabLab, qui intègre le développement web, la simulation 3D, les technologies IoT et l'exploitation des données.
 
 \section{Organigramme de l’établissement}
 
@@ -63,13 +65,13 @@ Le projet a été réalisé dans un contexte académique orienté vers l’innov
 
 Cependant, l’accès à ces équipements peut être limité par plusieurs contraintes : disponibilité des machines, besoin de présence physique, difficulté de supervision à distance et absence d’outils unifiés permettant de relier gestion, simulation et analyse de données.
 
-Dans ce contexte, la création d’un FabLab virtuel représente une réponse pertinente. Elle permet de préparer les utilisateurs avant l’utilisation réelle des machines, de simuler des trajectoires de fabrication et d’introduire une couche de supervision intelligente fondée sur les données.
+Dans ce contexte, la création d’un FabLab virtuel représente une réponse pertinente. Elle permet de préparer les utilisateurs avant l’utilisation réelle des machines, de simuler des trajectoires de fabrication et d’introduire une couche de supervision intelligente fondée sur les données. Les données utilisées dans cette version sont simulées afin de valider l’architecture, les flux MQTT, le monitoring et le module d’analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
 \section{Problématique}
 
 Les FabLabs traditionnels reposent principalement sur une interaction physique avec les équipements. Cette approche est utile pour l’apprentissage pratique, mais elle présente certaines limites dans un contexte pédagogique moderne. Les étudiants ne disposent pas toujours d’un moyen simple pour visualiser les machines, tester un fichier de fabrication ou consulter l’état des équipements avant une séance.
 
-Par ailleurs, les machines de fabrication numérique produisent ou pourraient produire des données de fonctionnement telles que la température, la vibration, la durée d’utilisation, la vitesse du moteur ou les erreurs signalées. Ces données sont précieuses pour la supervision et la maintenance, mais elles restent souvent peu exploitées dans un cadre académique.
+Par ailleurs, les machines de fabrication numérique produisent ou pourraient produire des données de fonctionnement telles que la température, la vibration, la durée d’utilisation, la vitesse du moteur ou les erreurs signalées. Ces données sont précieuses pour la supervision et la maintenance, mais elles restent souvent peu exploitées dans un cadre académique. Dans la version réalisée, ces mesures ne proviennent pas encore de capteurs physiques : elles sont générées par un simulateur MQTT afin de tester les traitements et les interfaces dans des conditions contrôlées.
 
 La problématique du projet peut donc être formulée ainsi :
 
@@ -91,7 +93,7 @@ Les objectifs spécifiques sont les suivants :
     \item construire une scène 3D interactive représentant le FabLab et ses équipements ;
     \item simuler le comportement d’une imprimante 3D et d’une machine CNC à partir de fichiers G-code ou NC ;
     \item intégrer une télémétrie simulée transmise via MQTT ;
-    \item analyser les données collectées afin de détecter les anomalies et d’estimer l’état de santé des machines ;
+    \item analyser les données simulées afin de détecter les anomalies et d’estimer l’état de santé des machines ;
     \item afficher les indicateurs de supervision dans un tableau de bord administrateur.
 \end{itemize}
 
@@ -109,7 +111,7 @@ La solution réalisée couvre plusieurs modules complémentaires :
     \item un module de visualisation 3D du laboratoire ;
     \item un module de simulation G-code pour imprimante 3D et CNC ;
     \item un module MQTT permettant l’ingestion de télémétrie simulée ;
-    \item un module Data Science pour la détection d’anomalies, le score de santé et la maintenance prédictive.
+    \item un module Data Science pour la détection d’anomalies, le score de santé, l’estimation indicative du risque de panne et les recommandations de maintenance.
 \end{itemize}
 
 \begin{figure}[H]

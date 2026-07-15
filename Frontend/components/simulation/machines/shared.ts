@@ -94,6 +94,16 @@ export function lerpObjectAxisPosition(
   object.position[axis] = THREE.MathUtils.lerp(object.position[axis], target, blend);
 }
 
+export function dampObjectAxisPosition(
+  object: THREE.Object3D,
+  axis: "x" | "y" | "z",
+  target: number,
+  lambda: number,
+  dt: number,
+) {
+  object.position[axis] = THREE.MathUtils.damp(object.position[axis], target, lambda, dt);
+}
+
 export function lerpObjectPosition(
   object: THREE.Object3D,
   target: THREE.Vector3,

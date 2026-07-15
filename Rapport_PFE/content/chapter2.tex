@@ -12,7 +12,7 @@ L’étude des besoins vise à identifier les services que la plateforme doit fo
 
 L’étudiant doit pouvoir accéder au FabLab virtuel, consulter les machines disponibles, réserver un créneau et tester un fichier de fabrication dans une simulation 3D. L’administrateur doit disposer d’un espace de pilotage lui permettant de gérer les machines, les utilisateurs, les réservations et les indicateurs de supervision.
 
-Le système doit également être capable de recevoir des données simulées issues des machines, de les stocker et de les exploiter pour la détection d’anomalies et l’aide à la maintenance.
+Le système doit également être capable de recevoir des données simulées issues des machines, de les stocker et de les exploiter pour la détection d’anomalies et l’aide à la maintenance. Les données utilisées dans cette version sont simulées afin de valider l’architecture, les flux MQTT, le monitoring et le module d’analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
 \section{Besoins fonctionnels}
 
@@ -118,7 +118,7 @@ La plateforme est structurée autour des modules suivants :
     \item \textbf{Module FabLab 3D} : visualisation interactive de la salle et des machines avec sélection et consultation de leur état.
     \item \textbf{Module simulation} : importation et interprétation des fichiers G-code ou NC pour l’imprimante 3D et la CNC.
     \item \textbf{Module MQTT} : réception des données simulées publiées sur les topics machines.
-    \item \textbf{Module Data Science} : détection d’anomalies, estimation du score de santé, niveau de risque et recommandations.
+    \item \textbf{Module Data Science} : détection d’anomalies avec Isolation Forest, estimation du risque de panne avec Random Forest Classifier, calcul du score de santé, niveau de risque et recommandations par logique de règles.
     \item \textbf{Module notifications} : notification des étudiants après validation ou refus d’une réservation.
 \end{itemize}
 
@@ -153,11 +153,13 @@ Le système de réservation repose sur des créneaux d’une heure entre 8h00 et
 
 \subsection{Conception de la télémétrie}
 
-La télémétrie est reçue sous forme de messages JSON publiés via MQTT. Le backend associe chaque message à une machine existante, enregistre les mesures et expose l’historique à travers les routes de monitoring.
+Dans l’implémentation actuelle, la télémétrie simulée est reçue sous forme de messages JSON publiés via MQTT. Le backend associe chaque message à une machine existante, enregistre les mesures et expose l’historique à travers les routes de monitoring.
 
 \subsection{Conception de l’analyse intelligente}
 
-Le module Data Science combine une analyse par règles et des modèles entraînés avec scikit-learn. Il produit un statut d’anomalie, un score de santé, une probabilité de panne indicative et une recommandation de maintenance.
+Le module Data Science combine des modèles entraînés avec scikit-learn et une logique par règles. La détection d’anomalies s’appuie sur un modèle \textit{Isolation Forest}, tandis que l’estimation du risque de panne ou de maintenance repose sur un \textit{Random Forest Classifier}. Une logique complémentaire par règles est utilisée pour consolider le score de santé, le niveau de risque et les recommandations de maintenance, notamment lorsque les modèles ne sont pas disponibles ou lorsqu’une lecture doit être interprétée de manière explicable.
+
+Les variables analysées sont la température, la vibration, la durée d’utilisation exprimée sous forme \texttt{usage\_duration} puis convertie en \texttt{usage\_hours}, la vitesse du moteur \texttt{motor\_speed} et l’historique des erreurs signalées. Les sorties produites par le module sont le statut d’anomalie, la probabilité indicative de panne, le score de santé, le niveau de risque et une recommandation de maintenance.
 
 \section{Technologies utilisées}
 
@@ -185,7 +187,7 @@ Le module Data Science combine une analyse par règles et des modèles entraîn�
 
 \techitem{Blender}{images/blender.png}{Blender est un logiciel de modélisation 3D open source. Il intervient dans la préparation et l’optimisation des modèles 3D utilisés dans la plateforme, notamment ceux de l’imprimante 3D et de la machine CNC.}
 
-\techitem{MQTT}{images/mqtt.png}{MQTT est un protocole léger de communication publish/subscribe très utilisé dans les systèmes IoT. Dans ce projet, il permet de simuler l’envoi de mesures machines vers le backend. Les messages sont publiés sur des topics propres à chaque machine, selon le motif suivant :
+\techitem{MQTT}{images/mqtt.png}{MQTT est un protocole léger de communication publish/subscribe très utilisé dans les systèmes IoT. Dans ce projet, il permet de simuler l’envoi de mesures machines vers le backend à l’aide d’un simulateur MQTT. Les messages sont publiés sur des topics propres à chaque machine, selon le motif suivant :
 
 \begin{center}
 \small\texttt{fablab/machines/\{machine\_id\}/data}
@@ -195,7 +197,7 @@ Le module Data Science combine une analyse par règles et des modèles entraîn�
 
 \techitem{Tailwind CSS}{images/tailwind.png}{Tailwind CSS est un framework CSS utilitaire permettant de construire rapidement des interfaces cohérentes et responsives. Dans la plateforme, il est utilisé pour structurer les pages, les cartes, les tableaux, les formulaires et les tableaux de bord.}
 
-\techitem{Scikit-learn}{images/scikit_learn.png}{Scikit-learn est une bibliothèque Python dédiée au Machine Learning. Elle est utilisée dans ce projet pour entraîner et exploiter un modèle de détection d’anomalies de type Isolation Forest et un modèle de classification Random Forest pour l’estimation du risque de maintenance.}
+\techitem{Scikit-learn}{images/scikit_learn.png}{Scikit-learn est une bibliothèque Python dédiée au Machine Learning. Elle est utilisée dans ce projet pour entraîner et exploiter un modèle de détection d’anomalies de type Isolation Forest et un Random Forest Classifier pour l’estimation du risque de maintenance.}
 
 \techitem{Visual Studio Code}{images/vscode.png}{Visual Studio Code est l’environnement de développement utilisé pour organiser et modifier les différents modules du projet : frontend, backend, simulation, scripts Python et fichiers LaTeX du rapport.}
 
@@ -217,15 +219,13 @@ Le module Data Science combine une analyse par règles et des modèles entraîn�
 
 \subsection{Technologies et équipements IoT}
 
-Cette partie présente les composants matériels et les équipements de fabrication numérique liés à la dimension IoT du FabLab. Ces éléments permettent de relier la plateforme virtuelle à un environnement physique réel, en assurant la collecte de mesures, la communication des données et la supervision des machines.
+Cette partie présente les composants matériels et les équipements de fabrication numérique liés à la dimension IoT du FabLab. Dans la version actuelle, ils servent de référence pour concevoir les mesures et les scénarios de supervision. La collecte effective n’est pas encore réalisée par des capteurs physiques : elle est simulée par MQTT afin de valider les flux, le stockage et l’analyse avant une intégration matérielle future.
 
 \iotitem{ESP8266}{images/esp8266.jpg}{L’ESP8266 est un microcontrôleur doté d’une connectivité Wi-Fi intégrée, largement utilisé dans les applications de l’Internet des Objets. Dans un contexte FabLab, il peut servir d’interface entre les capteurs physiques et la plateforme de supervision. Il permet de collecter des mesures, de les traiter localement puis de les transmettre vers un serveur ou un broker MQTT. Son faible coût et sa facilité de programmation en font un choix adapté aux prototypes académiques et industriels légers.}
 
-\iotitem{Capteur de température}{images/DHT.jpg}{Le capteur de température permet de mesurer l’échauffement d’un environnement, d’un composant électronique ou d’une machine en fonctionnement. Dans le cadre d’un FabLab intelligent, cette donnée est utile pour surveiller les conditions de travail et prévenir les situations anormales. Une température excessive peut indiquer une surcharge, un défaut de ventilation ou une dégradation progressive d’un équipement. Les mesures collectées peuvent ensuite alimenter des tableaux de bord et des modèles de maintenance prédictive.}
+\iotitem{Capteur de température}{images/DHT.jpg}{Le capteur de température permet de mesurer l’échauffement d’un environnement, d’un composant électronique ou d’une machine en fonctionnement. Dans le cadre d’un FabLab intelligent, cette donnée est utile pour surveiller les conditions de travail et prévenir les situations anormales. Une température excessive peut indiquer une surcharge, un défaut de ventilation ou une dégradation progressive d’un équipement. Lors d’une connexion future à des capteurs réels, ces mesures pourront alimenter des tableaux de bord et des modèles de maintenance prédictive.}
 
 \iotitem{Capteur de vibration}{images/capteur_vibration.jpg}{Le capteur de vibration mesure les oscillations mécaniques produites par une machine pendant son fonctionnement. Ces données sont essentielles pour les équipements de fabrication numérique, car des vibrations inhabituelles peuvent révéler un désalignement, une usure ou un défaut mécanique. Dans une approche de maintenance préventive, l’analyse de ces signaux aide à identifier les anomalies avant l’apparition d’une panne. Les données de vibration constituent ainsi un indicateur pertinent de l’état de santé des machines.}
-
-\iotitem{Protocole MQTT}{images/mqtt.png}{MQTT est un protocole de messagerie léger basé sur le modèle publication/abonnement. Il est adapté aux systèmes IoT, car il réduit la charge réseau et facilite l’échange de données entre capteurs, microcontrôleurs et applications backend. Dans ce projet, il joue le rôle de canal de communication pour la télémétrie des machines. Les mesures peuvent être publiées sur des topics dédiés, puis consommées par la plateforme afin d’assurer le suivi et l’analyse des équipements.}
 
 \iotitem{Imprimante 3D}{images/imprimante_3d.png}{L’imprimante 3D est un équipement de fabrication additive permettant de produire des objets physiques à partir de modèles numériques. Elle fonctionne généralement par dépôt progressif de matière selon des trajectoires définies dans un fichier G-code. Dans un FabLab, elle constitue un outil pédagogique et technique essentiel pour le prototypage rapide. Son intégration à une plateforme IoT permet de suivre son état, sa température, sa progression et ses éventuelles anomalies de fonctionnement.}
 

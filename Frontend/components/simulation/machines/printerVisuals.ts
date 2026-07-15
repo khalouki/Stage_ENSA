@@ -13,12 +13,13 @@ import type { SurfaceReference } from "@/components/simulation/alignment";
 
 const FDM_NOZZLE_WIDTH_MM = 0.35;
 const FDM_LAYER_HEIGHT_MM = 0.1;
-const MIN_PATH_WIDTH = 0.025;
-const MAX_PATH_WIDTH = 0.55;
+const MIN_PATH_WIDTH = 0.018;
+const MAX_PATH_WIDTH = 0.18;
 const MIN_PATH_HEIGHT = 0.012;
 const EXTRUSION_EPSILON = 1e-7;
 const PRINT_POLYGON_OFFSET_FACTOR = -1;
 const PRINT_POLYGON_OFFSET_UNITS = -1;
+const FILAMENT_RADIAL_SEGMENTS = 10;
 
 // Filament color palette — mimics real PLA/PETG printed plastic.
 // Active (just extruded): bright molten orange-red glow.
@@ -29,18 +30,24 @@ const PRINTED_OBJECT_COLOR        = 0xc0392b;
 type PrintColor = THREE.ColorRepresentation | undefined;
 
 function createFilamentPathGeometry(): THREE.BufferGeometry {
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  geometry.translate(0, 0.5, 0);
+  const geometry = new THREE.CylinderGeometry(
+    1,
+    1,
+    1,
+    FILAMENT_RADIAL_SEGMENTS,
+    1,
+    false,
+  );
+  geometry.computeVertexNormals();
   return geometry;
 }
 
 /** Active bead: glowing hot molten filament fresh from the nozzle. */
-function createActiveMaterial(printLineColor?: PrintColor): THREE.MeshBasicMaterial {
-  return new THREE.MeshBasicMaterial({
+function createActiveMaterial(printLineColor?: PrintColor): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
     color: printLineColor ?? COLOR_FILAMENT_ACTIVE_BASE,
-    side: THREE.DoubleSide,
-    transparent: false,
-    opacity: 1,
+    roughness: 0.46,
+    metalness: 0,
     depthTest: true,
     depthWrite: true,
     polygonOffset: true,
@@ -50,12 +57,11 @@ function createActiveMaterial(printLineColor?: PrintColor): THREE.MeshBasicMater
 }
 
 /** Done bead: cooled, slightly shiny plastic. */
-function createDoneMaterial(printLineColor?: PrintColor): THREE.MeshBasicMaterial {
-  return new THREE.MeshBasicMaterial({
+function createDoneMaterial(printLineColor?: PrintColor): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
     color: printLineColor ?? COLOR_FILAMENT_DONE_BASE,
-    side: THREE.DoubleSide,
-    transparent: false,
-    opacity: 1,
+    roughness: 0.58,
+    metalness: 0,
     depthTest: true,
     depthWrite: true,
     polygonOffset: true,
@@ -66,6 +72,10 @@ function createDoneMaterial(printLineColor?: PrintColor): THREE.MeshBasicMateria
 
 function getPathVisualWidth(pathScale: number): number {
   return THREE.MathUtils.clamp(pathScale * FDM_NOZZLE_WIDTH_MM, MIN_PATH_WIDTH, MAX_PATH_WIDTH);
+}
+
+function getFilamentRadius(width: number, height: number): number {
+  return THREE.MathUtils.clamp(Math.min(width, height) * 0.48, MIN_PATH_HEIGHT * 0.35, MAX_PATH_WIDTH * 0.5);
 }
 
 export function getPrinterBeadSize(
@@ -113,12 +123,13 @@ export function createPrinterSegmentObject(
     const mat = createActiveMaterial(printLineColor);
     const path = new THREE.Mesh(geo, mat);
     path.frustumCulled = false;
-    path.scale.set(visibleLength, height, width);
-    path.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), direction.normalize());
+    const radius = getFilamentRadius(width, height);
+    path.scale.set(radius, visibleLength, radius * 0.72);
+    path.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
     path.position.copy(start).lerp(end, 0.5);
-    path.position.y += PRINTER_BEAD_Y_OFFSET;
-    path.castShadow = false;
-    path.receiveShadow = false;
+    path.position.y += PRINTER_BEAD_Y_OFFSET + radius;
+    path.castShadow = true;
+    path.receiveShadow = true;
     path.userData.isRapid = false;
     path.userData.kind = "print";
     return path;
@@ -282,7 +293,7 @@ export function buildPrintedGeometry(
   const helperPosition = new THREE.Vector3();
   const helperScale = new THREE.Vector3();
   const helperQuaternion = new THREE.Quaternion();
-  const xAxis = new THREE.Vector3(1, 0, 0);
+  const yAxis = new THREE.Vector3(0, 1, 0);
 
   for (let index = 0; index < segments.length; index += chunkSize) {
     const slice = segments.slice(index, index + chunkSize);
@@ -290,16 +301,17 @@ export function buildPrintedGeometry(
     mesh.frustumCulled = false;
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     mesh.count = 0;
-    mesh.castShadow = false;
-    mesh.receiveShadow = false;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 
     slice.forEach((segment, localIndex) => {
       const direction = segment.end.clone().sub(segment.start);
       const length = Math.max(direction.length(), 0.02);
-      helperQuaternion.setFromUnitVectors(xAxis, direction.normalize());
-      helperScale.set(length, segment.height, segment.width);
+      const radius = getFilamentRadius(segment.width, segment.height);
+      helperQuaternion.setFromUnitVectors(yAxis, direction.normalize());
+      helperScale.set(radius, length, radius * 0.72);
       helperPosition.copy(segment.start).lerp(segment.end, 0.5);
-      helperPosition.y += PRINTER_BEAD_Y_OFFSET;
+      helperPosition.y += PRINTER_BEAD_Y_OFFSET + radius;
       helperMatrix.compose(helperPosition, helperQuaternion, helperScale);
       mesh.setMatrixAt(localIndex, helperMatrix);
     });

@@ -6,6 +6,8 @@ const EDITOR_BACKGROUND = 0xf3f4f6;
 const EDITOR_GROUND = 0xeff1f4;
 const EDITOR_GRID_MAJOR = 0xc9d0d8;
 const EDITOR_GRID_MINOR = 0xdde2e8;
+const MAX_RENDERER_PIXEL_RATIO = 1.75;
+const SHADOW_MAP_SIZE = 1024;
 
 export type SceneSetupResult = {
   scene: THREE.Scene;
@@ -26,7 +28,7 @@ export function createSimulationScene(
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setClearColor(EDITOR_BACKGROUND);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_RENDERER_PIXEL_RATIO));
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -54,32 +56,24 @@ export function createSimulationScene(
   controls.maxDistance = 800;
   controls.target.set(0, 0, 0);
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-  ambient.name = "ambientMain";
+  const ambient = new THREE.HemisphereLight(0xffffff, 0xdde3ea, 1.35);
+  ambient.name = "hemisphereMain";
   scene.add(ambient);
 
   const sun = new THREE.DirectionalLight(0xffffff, 1.2);
   sun.name = "dirMain";
-  sun.position.set(80, 120, 90);
+  sun.position.set(70, 130, 95);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
   sun.shadow.camera.near = 1;
   sun.shadow.camera.far = 800;
   sun.shadow.camera.left = -200;
   sun.shadow.camera.right = 200;
   sun.shadow.camera.top = 200;
   sun.shadow.camera.bottom = -200;
+  sun.shadow.bias = -0.00008;
+  sun.shadow.normalBias = 0.02;
   scene.add(sun);
-
-  const fill = new THREE.DirectionalLight(0xffffff, 0.45);
-  fill.name = "dirFill";
-  fill.position.set(-90, 70, -110);
-  scene.add(fill);
-
-  const cncFill = new THREE.DirectionalLight(0xffffff, 0.35);
-  cncFill.name = "cncFill";
-  cncFill.position.set(-80, 60, -80);
-  scene.add(cncFill);
 
   const grid = new THREE.GridHelper(400, 40, EDITOR_GRID_MAJOR, EDITOR_GRID_MINOR);
   grid.name = "gridHelper";
@@ -114,6 +108,7 @@ export function createSimulationScene(
   shaft.name = "toolShaft";
   shaft.userData.toolVisualRole = "printerGeneratedVisual";
   shaft.position.y = 5;
+  shaft.castShadow = true;
   toolGroup.add(shaft);
 
   const bit = new THREE.Mesh(
@@ -130,6 +125,7 @@ export function createSimulationScene(
   bit.userData.toolVisualRole = "printerGeneratedVisual";
   bit.rotation.x = Math.PI;
   bit.position.y = -1;
+  bit.castShadow = true;
   toolGroup.add(bit);
 
   const ring = new THREE.Mesh(
@@ -166,6 +162,7 @@ export function createSimulationScene(
   const resizeObserver = new ResizeObserver(() => {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_RENDERER_PIXEL_RATIO));
     renderer.setSize(container.clientWidth, container.clientHeight);
   });
   resizeObserver.observe(container);

@@ -7,8 +7,8 @@ import {
   SurfaceReference,
 } from "@/components/simulation/alignment";
 import {
+  dampObjectAxisPosition,
   findNodeByNameFlexible,
-  lerpObjectAxisPosition,
 } from "@/components/simulation/machines/shared";
 import {
   PRINTER_BED_PART,
@@ -37,6 +37,13 @@ const CNC_DESIGN_FIT_RATIO = 0.46;
 // Blender bed axis is Y, but the imported Three.js visual front/back axis is Z,
 // so animate the actual bed meshes on local Z instead of moving Cube.003 on Y.
 const PRINTER_BED_VISUAL_AXIS = "z";
+const PRINTER_HEAD_DAMPING = 16;
+const PRINTER_Z_DAMPING = 18;
+const PRINTER_BED_DAMPING = 14;
+const PRINTER_PARK_DAMPING = 7;
+const PRINTER_PARK_EPSILON = 0.0005;
+const NOZZLE_COOL_EMISSIVE = 0x1a0600;
+const NOZZLE_HOT_EMISSIVE = 0xff5a1f;
 let lastPrinterKinematicsDebugAt = 0;
 
 function formatVector3(vector: THREE.Vector3): [number, number, number] {
@@ -77,9 +84,15 @@ function applyBedMotionDelta(
   axis: typeof PRINTER_BED_VISUAL_AXIS,
   initialPosition: THREE.Vector3,
   delta: number,
-  blend: number,
+  dt: number,
+  immediate: boolean,
 ): void {
-  lerpObjectAxisPosition(target, axis, initialPosition[axis] + delta, blend);
+  const next = initialPosition[axis] + delta;
+  if (immediate) {
+    target.position[axis] = next;
+    return;
+  }
+  dampObjectAxisPosition(target, axis, next, PRINTER_BED_DAMPING, dt);
 }
 
 export function findPrinterBedObject(root: THREE.Object3D): THREE.Object3D | null {
@@ -198,19 +211,47 @@ export function computePrinterMotionWorldBounds(
   return { minX, maxX, minY, maxY, minZ, maxZ };
 }
 
+export function computePrinterPrintLayerWorldBounds(
+  moves: SimulationMove[],
+  toWorld: (gx: number, gy: number, gz: number) => THREE.Vector3,
+) {
+  let minZ = Number.POSITIVE_INFINITY;
+  let maxZ = Number.NEGATIVE_INFINITY;
+
+  for (const move of moves) {
+    if (move.operation !== "print") continue;
+    const world = toWorld(move.x, move.y, move.z);
+    minZ = Math.min(minZ, world.y);
+    maxZ = Math.max(maxZ, world.y);
+  }
+
+  if (!Number.isFinite(minZ) || !Number.isFinite(maxZ)) {
+    const bounds = computePrinterMotionWorldBounds(moves, toWorld);
+    return {
+      minZ: bounds.minZ,
+      maxZ: bounds.maxZ,
+    };
+  }
+
+  if (maxZ - minZ < 1e-6) maxZ = minZ;
+  return { minZ, maxZ };
+}
+
 export function stylePrinterBed(bedMesh: THREE.Mesh | null): void {
   if (!bedMesh) return;
 
   const applyToMaterial = (material: THREE.Material) => {
     const next = material.clone();
-    if ("color" in next && next.color instanceof THREE.Color) {
-      next.color.setHex(0xf6f8fb);
-    }
     if (next instanceof THREE.MeshStandardMaterial || next instanceof THREE.MeshPhysicalMaterial) {
-      next.color.setHex(0xf5f7fa);
-      next.roughness = 0.72;
-      next.metalness = 0.05;
+      next.roughness = THREE.MathUtils.clamp(next.roughness * 0.72 + 0.18, 0.42, 0.68);
+      next.metalness = Math.max(next.metalness, 0.04);
+      next.envMapIntensity = Math.max(next.envMapIntensity, 0.7);
+      if (next instanceof THREE.MeshPhysicalMaterial) {
+        next.clearcoat = Math.max(next.clearcoat, 0.12);
+        next.clearcoatRoughness = Math.max(next.clearcoatRoughness, 0.55);
+      }
     }
+    next.needsUpdate = true;
     return next;
   };
 
@@ -221,10 +262,165 @@ export function stylePrinterBed(bedMesh: THREE.Mesh | null): void {
   }
 }
 
+function enhanceNozzleMaterial(material: THREE.Material): THREE.Material {
+  const color =
+    "color" in material && material.color instanceof THREE.Color
+      ? material.color.clone()
+      : new THREE.Color(0x5f6266);
+  const next =
+    material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial
+      ? material.clone()
+      : new THREE.MeshStandardMaterial({ color });
+
+  if (next instanceof THREE.MeshStandardMaterial) {
+    next.color.copy(color);
+    next.metalness = Math.max(next.metalness, 0.62);
+    next.roughness = THREE.MathUtils.clamp(next.roughness * 0.55 + 0.16, 0.22, 0.42);
+    next.emissive = new THREE.Color(NOZZLE_COOL_EMISSIVE);
+    next.emissiveIntensity = 0;
+    next.envMapIntensity = Math.max(next.envMapIntensity, 0.85);
+  }
+
+  next.userData.printerNozzleMaterial = true;
+  next.needsUpdate = true;
+  return next;
+}
+
+export function stylePrinterNozzle(nozzleObject: THREE.Object3D | null): void {
+  if (!nozzleObject) return;
+
+  nozzleObject.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (Array.isArray(child.material)) {
+      child.material = child.material.map(enhanceNozzleMaterial);
+    } else if (child.material) {
+      child.material = enhanceNozzleMaterial(child.material);
+    }
+    child.castShadow = true;
+  });
+}
+
+export function updatePrinterNozzleHeat(
+  kinematics: PrinterKinematics | null,
+  isPrinting: boolean,
+  dt: number,
+): void {
+  const nozzleObject = kinematics?.nozzleObject;
+  if (!nozzleObject) return;
+
+  const current = typeof nozzleObject.userData.printerNozzleHeat === "number"
+    ? nozzleObject.userData.printerNozzleHeat
+    : 0;
+  const target = isPrinting ? 1 : 0;
+  const next = THREE.MathUtils.damp(current, target, isPrinting ? 5.5 : 2.6, Math.max(dt, 0));
+  nozzleObject.userData.printerNozzleHeat = next;
+  const emissive = new THREE.Color(NOZZLE_COOL_EMISSIVE).lerp(new THREE.Color(NOZZLE_HOT_EMISSIVE), next);
+
+  nozzleObject.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    for (const material of materials) {
+      if (
+        material.userData?.printerNozzleMaterial &&
+        (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial)
+      ) {
+        material.emissive.copy(emissive);
+        material.emissiveIntensity = THREE.MathUtils.lerp(0.02, 0.95, next);
+      }
+    }
+  });
+}
+
+export function configurePrinterModelShadows(model: THREE.Object3D): void {
+  model.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.castShadow = false;
+      child.receiveShadow = false;
+    }
+  });
+
+  const enableMeshShadows = (
+    object: THREE.Object3D | null,
+    options: { cast?: boolean; receive?: boolean },
+  ) => {
+    object?.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      child.castShadow = Boolean(options.cast);
+      child.receiveShadow = Boolean(options.receive);
+    });
+  };
+
+  enableMeshShadows(findPrinterBedObject(model), { cast: true, receive: true });
+  enableMeshShadows(findPrinterPrintSurfaceObject(model), { receive: true });
+  for (const name of PRINTER_HEAD_PARTS) {
+    enableMeshShadows(findNodeByNameFlexible(model, name), { cast: true });
+  }
+  for (const name of PRINTER_Z_PARTS) {
+    enableMeshShadows(findNodeByNameFlexible(model, name), { cast: true });
+  }
+  enableMeshShadows(findNodeByNameFlexible(model, PRINTER_NOZZLE_OBJECT_NAME), { cast: true });
+}
+
 export function tickPrinterBed(_kinematics: PrinterKinematics | null, _isPrinting: boolean): void {
   void _kinematics;
   void _isPrinting;
   // The real bed meshes are positioned from G-code Y in syncPrinterMechanics.
+}
+
+function getPrinterLayerLocalOffset(kinematics: PrinterKinematics, toolWorldY: number): number {
+  const layerMin = kinematics.printLayerWorldBounds.minZ;
+  const layerMax = Math.max(kinematics.printLayerWorldBounds.maxZ, layerMin);
+  const layerSpan = Math.max(layerMax - layerMin, 0);
+  const safetyGap = THREE.MathUtils.clamp(layerSpan * 0.015, 0.006, 0.025);
+  const currentLayerHeight = THREE.MathUtils.clamp(
+    toolWorldY - layerMin + safetyGap,
+    0,
+    layerSpan + safetyGap,
+  );
+  const localLayerLift = currentLayerHeight / Math.max(Math.abs(kinematics.modelWorldScaleY), 1e-6);
+  return THREE.MathUtils.clamp(
+    PRINTER_Z_MIN + localLayerLift,
+    kinematics.zLimits.minLocalOffset,
+    kinematics.zLimits.maxLocalOffset,
+  );
+}
+
+export function parkPrinterMechanics(
+  machineType: MachineId | "generic",
+  kinematics: PrinterKinematics | null,
+  dt: number,
+  immediate = false,
+): boolean {
+  if (machineType !== "printer3d" || !kinematics) return true;
+
+  let maxDelta = 0;
+  const settleAxis = (
+    part: PositionedPrinterPart,
+    axis: "x" | "y" | "z",
+    target: number,
+  ) => {
+    if (immediate) {
+      part.object.position[axis] = target;
+      return;
+    } else {
+      dampObjectAxisPosition(part.object, axis, target, PRINTER_PARK_DAMPING, dt);
+      if (Math.abs(part.object.position[axis] - target) < PRINTER_PARK_EPSILON) {
+        part.object.position[axis] = target;
+      }
+    }
+    maxDelta = Math.max(maxDelta, Math.abs(part.object.position[axis] - target));
+  };
+
+  for (const part of kinematics.headParts) {
+    settleAxis(part, "x", part.initialPosition.x);
+    settleAxis(part, "y", part.initialPosition.y);
+  }
+
+  for (const part of kinematics.zParts) {
+    settleAxis(part, "y", part.initialPosition.y);
+  }
+
+  return maxDelta < PRINTER_PARK_EPSILON;
 }
 
 export function syncPrinterMechanics(
@@ -236,11 +432,8 @@ export function syncPrinterMechanics(
 ): void {
   if (machineType !== "printer3d" || !kinematics) return;
 
-  const blendXY = immediate ? 1 : THREE.MathUtils.clamp(dt * 14, 0.12, 0.82);
-  const blendZ = immediate ? 1 : THREE.MathUtils.clamp(dt * 18, 0.18, 0.9);
   const xSpan = Math.max(kinematics.motionWorldBounds.maxX - kinematics.motionWorldBounds.minX, 1e-6);
   const ySpan = Math.max(kinematics.motionWorldBounds.maxY - kinematics.motionWorldBounds.minY, 1e-6);
-  const zSpan = Math.max(kinematics.motionWorldBounds.maxZ - kinematics.motionWorldBounds.minZ, 1e-6);
   const xProgress = THREE.MathUtils.clamp(
     (toolWorldPos.x - kinematics.motionWorldBounds.minX) / xSpan,
     0,
@@ -251,21 +444,12 @@ export function syncPrinterMechanics(
     0,
     1,
   );
-  const zProgress = THREE.MathUtils.clamp(
-    (toolWorldPos.y - kinematics.motionWorldBounds.minZ) / zSpan,
-    0,
-    1,
-  );
   const headOffsetX = THREE.MathUtils.lerp(
     kinematics.xLimits.minLocalOffset,
     kinematics.xLimits.maxLocalOffset,
     xProgress,
   );
-  const zOffsetY = THREE.MathUtils.lerp(
-    kinematics.zLimits.minLocalOffset,
-    kinematics.zLimits.maxLocalOffset,
-    zProgress,
-  );
+  const zOffsetY = getPrinterLayerLocalOffset(kinematics, toolWorldPos.y);
   const bedOffset = THREE.MathUtils.lerp(PRINTER_BED_MIN, PRINTER_BED_MAX, yProgress);
   kinematics.currentBedOffset = bedOffset;
   const debugHeadOffsetX = headOffsetX + PRINTER_DEBUG_VISIBLE_OFFSET;
@@ -274,19 +458,28 @@ export function syncPrinterMechanics(
   for (const part of kinematics.headParts) {
     const targetX = part.initialPosition.x + debugHeadOffsetX;
     const targetY = part.initialPosition.y + debugZOffsetY;
-    lerpObjectAxisPosition(part.object, "x", targetX, blendXY);
+    if (immediate) {
+      part.object.position.x = targetX;
+      part.object.position.y = targetY;
+      continue;
+    }
+    dampObjectAxisPosition(part.object, "x", targetX, PRINTER_HEAD_DAMPING, dt);
     // G-code Z is world Y in this scene, and this imported printer model uses
     // local Y for vertical head/nozzle travel.
-    lerpObjectAxisPosition(part.object, "y", targetY, blendZ);
+    dampObjectAxisPosition(part.object, "y", targetY, PRINTER_Z_DAMPING, dt);
   }
 
   for (const part of kinematics.zParts) {
     const targetY = part.initialPosition.y + debugZOffsetY;
-    lerpObjectAxisPosition(part.object, "y", targetY, blendZ);
+    if (immediate) {
+      part.object.position.y = targetY;
+    } else {
+      dampObjectAxisPosition(part.object, "y", targetY, PRINTER_Z_DAMPING, dt);
+    }
   }
 
   for (const part of kinematics.bedParts) {
-    applyBedMotionDelta(part.object, PRINTER_BED_VISUAL_AXIS, part.initialPosition, bedOffset, blendXY);
+    applyBedMotionDelta(part.object, PRINTER_BED_VISUAL_AXIS, part.initialPosition, bedOffset, dt, immediate);
   }
 
   if (process.env.NODE_ENV !== "production") {
@@ -389,6 +582,7 @@ export function createPrinterKinematics({
   const nozzleObject = findNodeByNameFlexible(model, PRINTER_NOZZLE_OBJECT_NAME);
   const nozzleMesh = nozzleObject ? findNodeByNameFlexible(nozzleObject, PRINTER_NOZZLE_MESH_NAME) : null;
   stylePrinterBed(bedMesh);
+  stylePrinterNozzle(nozzleObject);
 
   console.info("[Printer3D] Real nozzle lookup", {
     nozzleObject: nozzleObject?.name ?? null,
@@ -525,6 +719,8 @@ export function createPrinterKinematics({
     ? toWorld(firstMove.x, firstMove.y, firstMove.z)
     : headParts[0]?.object.getWorldPosition(new THREE.Vector3()) ?? new THREE.Vector3();
   const motionWorldBounds = computePrinterMotionWorldBounds(moves, toWorld);
+  const printLayerWorldBounds = computePrinterPrintLayerWorldBounds(moves, toWorld);
+  const modelWorldScale = model.getWorldScale(new THREE.Vector3());
 
   console.info("[Printer3D] X travel", {
     measuredMin: xLimits.minLocalOffset,
@@ -559,5 +755,7 @@ export function createPrinterKinematics({
     xLimits,
     zLimits,
     motionWorldBounds,
+    printLayerWorldBounds,
+    modelWorldScaleY: Math.max(Math.abs(modelWorldScale.y), 1e-6),
   };
 }

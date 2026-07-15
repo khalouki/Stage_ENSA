@@ -4,7 +4,7 @@
 
 Ce chapitre présente la validation fonctionnelle de la plateforme \textbf{Virtual FabLab}, les résultats obtenus, ainsi que les limites actuelles du travail réalisé. Après la description de l'implémentation dans le chapitre précédent, il s'agit ici de vérifier que les principales fonctionnalités répondent aux besoins définis : consultation du laboratoire virtuel, gestion des machines, réservation, simulation 3D, authentification, administration et communication entre le frontend et le backend.
 
-La validation effectuée reste adaptée au contexte d'un projet de fin d'études. Elle porte principalement sur le bon fonctionnement des parcours utilisateurs et administrateurs, ainsi que sur la cohérence des échanges entre les différentes couches de l'application. Les parties liées à l'IoT et à la Data Science sont abordées avec prudence, car elles reposent encore sur des données simulées ou sur une base préparée pour une intégration future avec des équipements réels.
+La validation effectuée reste adaptée au contexte d'un projet de fin d'études. Elle porte principalement sur le bon fonctionnement des parcours utilisateurs et administrateurs, ainsi que sur la cohérence des échanges entre les différentes couches de l'application. Les parties liées à l'IoT et à la Data Science sont abordées avec prudence, car elles reposent sur des données simulées par un simulateur MQTT. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
 \section{Validation fonctionnelle de la plateforme}
 
@@ -51,6 +51,22 @@ Son rôle consiste principalement à construire l'URL du backend, ajouter les en
 
 La figure \ref{fig:api-communication-validation} illustre le principe général des échanges. Le frontend envoie une requête HTTP vers l'API FastAPI. Le backend valide la requête, applique la logique métier, interagit avec la base de données ou les services concernés, puis retourne une réponse JSON ou une erreur HTTP. Cette organisation rend la communication plus claire et facilite l'évolution de la plateforme.
 
+\subsection{Évaluation fonctionnelle du module Data Science}
+
+L'évaluation du module Data Science est une évaluation fonctionnelle du prototype. Elle ne vise pas à annoncer une précision industrielle, car les données utilisées sont simulées. L'objectif est de vérifier que le module est correctement intégré dans la chaîne applicative et qu'il produit des résultats cohérents avec les scénarios de télémétrie simulée.
+
+Les vérifications réalisées portent sur les points suivants :
+
+\begin{itemize}
+    \item les messages MQTT publiés par le simulateur sont reçus par le backend ;
+    \item les mesures de télémétrie sont enregistrées dans la base de données SQLite ;
+    \item l'endpoint de prédiction retourne un statut d'anomalie, une probabilité indicative de panne, un score de santé, un niveau de risque et une recommandation ;
+    \item le tableau de bord affiche le score de santé, la probabilité de panne et les recommandations de maintenance ;
+    \item des alertes d'anomalies sont générées lorsque des valeurs anormales apparaissent dans la télémétrie simulée.
+\end{itemize}
+
+Cette validation confirme l'intégration technique du module : ingestion MQTT, stockage, analyse et restitution dans l'interface administrateur. Elle reste toutefois fonctionnelle et ne doit pas être interprétée comme une mesure de performance prédictive sur machines réelles.
+
 \section{Résultats obtenus}
 
 Les résultats obtenus montrent que la plateforme développée constitue un prototype fonctionnel répondant aux objectifs principaux du projet. L'application web permet à l'utilisateur de consulter les machines, accéder au laboratoire virtuel, effectuer des réservations et visualiser des simulations liées aux machines numériques.
@@ -59,13 +75,19 @@ Du côté administrateur, la plateforme permet la gestion des machines, des util
 
 La simulation 3D est opérationnelle pour représenter le FabLab virtuel et illustrer le comportement de machines telles que la CNC et l'imprimante 3D. Elle apporte une dimension visuelle et pédagogique importante au projet, en permettant à l'utilisateur d'interagir avec les machines avant une utilisation réelle.
 
-Enfin, le projet fournit une base solide pour l'intégration future de l'IoT et de la Data Science. Les mécanismes liés à la télémétrie, à la supervision et à l'analyse de données sont préparés ou simulés, ce qui permet de démontrer l'orientation du système vers un FabLab connecté et intelligent sans prétendre à une validation industrielle complète.
+Enfin, le projet intègre un premier module intelligent fondé sur la télémétrie simulée. Ce module exploite Isolation Forest pour la détection d'anomalies, Random Forest Classifier pour l'estimation indicative du risque de panne, et une logique par règles pour le score de santé, le niveau de risque et les recommandations de maintenance. Il permet de démontrer l'orientation du système vers un FabLab connecté et intelligent sans prétendre à une validation industrielle complète.
 
 \section{Limites actuelles et perspectives}
 
-Malgré les résultats obtenus, certaines limites doivent être mentionnées. La première concerne la télémétrie, qui reste simulée. Les données utilisées permettent de tester les flux et les interfaces, mais elles ne remplacent pas des mesures réelles issues de capteurs installés sur des machines physiques.
+\subsection{Limites des données et validation}
+
+Malgré les résultats obtenus, certaines limites doivent être mentionnées. La première concerne la télémétrie, qui reste simulée. Les données utilisées permettent de tester les flux, les interfaces, le stockage et le module d'analyse, mais elles ne remplacent pas des mesures réelles issues de capteurs installés sur des machines physiques.
+
+Ainsi, les résultats du module Data Science sont indicatifs. Ils servent à valider le prototype, la cohérence des traitements et l'intégration entre MQTT, la base de données, les endpoints de prédiction et le tableau de bord. Ils ne permettent pas, à ce stade, d'affirmer une précision industrielle ou une capacité de généralisation sur de vraies machines.
 
 La deuxième limite concerne l'absence de connexion directe avec de vraies machines IoT. Les scénarios de communication MQTT et de supervision sont préparés, mais ils nécessitent encore une validation avec des équipements réels. De même, la simulation 3D ne reproduit pas totalement le comportement réel des machines, notamment les contraintes mécaniques, les vibrations, les variations thermiques ou les défauts de fabrication.
+
+\subsection{Perspectives d'évolution}
 
 Plusieurs perspectives peuvent être envisagées pour améliorer la plateforme :
 
@@ -77,10 +99,10 @@ Plusieurs perspectives peuvent être envisagées pour améliorer la plateforme :
     \item développer un dashboard analytique plus avancé avec des courbes, alertes et indicateurs de performance.
 \end{itemize}
 
-Ces perspectives montrent que la solution actuelle peut servir de base évolutive. Elle permet déjà de valider l'architecture et les principaux parcours fonctionnels, tout en laissant une marge d'amélioration importante vers une plateforme plus connectée et plus intelligente.
+Ces perspectives montrent que la solution actuelle peut servir de base évolutive. Elle permet déjà de valider l'architecture, les flux MQTT simulés, le stockage de la télémétrie et les principaux parcours fonctionnels, tout en laissant une marge d'amélioration importante vers une plateforme plus connectée et plus intelligente.
 
 \section{Conclusion}
 
 Ce chapitre a présenté la validation fonctionnelle de la plateforme, les résultats obtenus ainsi que les limites actuelles du projet. Les tests réalisés confirment le fonctionnement des principaux modules : frontend, backend, authentification, gestion des machines, réservations, simulation 3D et communication API.
 
-La plateforme Virtual FabLab répond ainsi aux objectifs essentiels du projet, tout en restant réaliste sur les limites liées à la simulation et à l'absence de machines IoT réelles. Elle constitue une base fonctionnelle et évolutive pour de futurs travaux autour de la supervision, de l'analyse de données et de la maintenance prédictive dans un FabLab connecté.
+La plateforme Virtual FabLab répond ainsi aux objectifs essentiels du projet, tout en restant réaliste sur les limites liées à la simulation et à l'absence de machines IoT réelles. Elle intègre déjà un premier module intelligent de supervision et de maintenance prédictive indicative, dont la validation industrielle nécessitera des données issues de capteurs réels.

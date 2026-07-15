@@ -4,7 +4,7 @@
 
 Ce chapitre présente la réalisation technique de la plateforme Virtual FabLab. Contrairement au chapitre précédent, qui décrit l’analyse et la conception, cette partie se concentre sur l’implémentation effective du projet : organisation du code, architecture frontend/backend, modules fonctionnels, simulation 3D, communication MQTT et tableau de bord de supervision.
 
-La plateforme réalisée repose sur un backend FastAPI, une interface Next.js et des modules spécialisés pour la visualisation 3D, l’interprétation des fichiers de fabrication et l’analyse des données de télémétrie.
+La plateforme réalisée repose sur un backend FastAPI, une interface Next.js et des modules spécialisés pour la visualisation 3D, l’interprétation des fichiers de fabrication et l’analyse des données de télémétrie. Les données utilisées dans cette version sont simulées afin de valider l’architecture, les flux MQTT, le monitoring et le module d’analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
 \section{Architecture frontend/backend}
 
@@ -114,7 +114,6 @@ Les types de machines initialisés par défaut incluent notamment :
 \begin{itemize}
     \item une imprimante 3D associée au modèle \texttt{/models/3d\_printer.glb} ;
     \item une machine CNC associée au modèle \texttt{/models/CNC.glb} ;
-    \item un type découpeuse laser prévu pour l’extension de la plateforme.
 \end{itemize}
 
 \begin{figure}[H]
@@ -175,7 +174,7 @@ Les trajectoires sont transformées en mouvements simulables dans la scène 3D. 
 
 La simulation de l’imprimante 3D prend en charge les fichiers G-code contenant les déplacements, l’axe d’extrusion, les vitesses d’avance et certaines commandes propres à l’impression 3D. Le système distingue les déplacements sans extrusion des segments imprimés.
 
-La scène affiche progressivement la trajectoire d’impression et peut représenter les couches de l’objet. Le panneau latéral permet de suivre la progression, la position courante, la vitesse de lecture, la température simulée et les informations associées à la télémétrie lorsque la machine sélectionnée est liée à une instance réelle du backend.
+La scène affiche progressivement la trajectoire d’impression et peut représenter les couches de l’objet. Le panneau latéral permet de suivre la progression, la position courante, la vitesse de lecture, la température simulée et les informations associées à la télémétrie lorsque la machine sélectionnée est liée à une instance enregistrée dans le backend.
 
 \begin{figure}[H]
 \centering
@@ -203,13 +202,13 @@ Le système vérifie également la compatibilité du fichier avec la machine sé
 
 \section{Télémétrie simulée avec MQTT}
 
-La télémétrie est simulée par un script Python qui publie périodiquement des messages MQTT. Chaque message est envoyé sur un topic de la forme :
+La télémétrie est simulée par un script Python qui publie périodiquement des messages MQTT. Ce choix permet de valider le flux complet sans dépendre, à ce stade, d’une installation physique de capteurs. Les données utilisées dans cette version sont simulées afin de valider l’architecture, les flux MQTT, le monitoring et le module d’analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels. Chaque message est envoyé sur un topic de la forme :
 
 \begin{center}
 \texttt{fablab/machines/\{machine\_id\}/data}
 \end{center}
 
-Le message contient l’identifiant de la machine, la température, la vibration, la durée d’utilisation, la vitesse du moteur, une éventuelle erreur et un horodatage. Le backend s’abonne au motif \texttt{fablab/machines/+/data}, parse les messages JSON et enregistre les mesures dans la base de données.
+Le message contient l’identifiant de la machine, la température, la vibration, la durée d’utilisation, la vitesse du moteur, une éventuelle erreur et un horodatage. Le backend s’abonne au motif \texttt{fablab/machines/+/data}, analyse les messages JSON et enregistre les mesures dans la base de données SQLite.
 
 \begin{figure}[H]
 \centering
@@ -224,7 +223,7 @@ Le message contient l’identifiant de la machine, la température, la vibration
 
 Le tableau de bord administrateur centralise les informations de supervision. Il affiche l’état de la connexion MQTT, la fraîcheur des données, le nombre d’utilisateurs, le nombre de machines, les réservations en attente et les résultats de monitoring intelligent.
 
-Le module Data Science exploite les mesures reçues afin de produire :
+Le module Data Science exploite les mesures simulées reçues via MQTT afin de produire :
 
 \begin{itemize}
     \item un statut d’anomalie par machine ;
@@ -232,8 +231,12 @@ Le module Data Science exploite les mesures reçues afin de produire :
     \item un niveau de risque de maintenance ;
     \item une probabilité indicative de panne ;
     \item une recommandation de maintenance ;
-    \item des facteurs explicatifs tels que température, vibration, utilisation et erreurs récentes.
+    \item des facteurs explicatifs tels que température, vibration, durée d’utilisation, vitesse du moteur et erreurs récentes.
 \end{itemize}
+
+Sur le plan technique, la détection d’anomalies utilise un modèle \textit{Isolation Forest}. L’estimation du risque de panne ou de maintenance s’appuie sur un \textit{Random Forest Classifier}. Le score de santé, le niveau de risque et les recommandations sont complétés par une logique par règles, afin de rendre les résultats exploitables même lorsque les modèles entraînés ne sont pas disponibles ou lorsque des seuils métier doivent être pris en compte.
+
+Les caractéristiques analysées sont \texttt{temperature}, \texttt{vibration}, \texttt{usage\_duration} convertie en \texttt{usage\_hours}, \texttt{motor\_speed} et l’historique des erreurs. Les sorties exposées au tableau de bord et aux endpoints d’analyse sont le statut d’anomalie, la probabilité indicative de panne, le score de santé, le niveau de risque et une recommandation de maintenance.
 
 \begin{figure}[H]
 \centering
@@ -246,9 +249,9 @@ Le module Data Science exploite les mesures reçues afin de produire :
 
 \section{Alertes d’anomalies et score de santé}
 
-La détection des anomalies repose sur deux niveaux. Le premier utilise des règles et des seuils adaptés au type de machine, par exemple pour la température, la vibration ou la vitesse du moteur. Le second exploite les modèles entraînés avec scikit-learn lorsque les fichiers de modèles sont disponibles.
+La détection des anomalies repose sur deux niveaux. Le premier exploite le modèle \textit{Isolation Forest} lorsque les fichiers de modèles entraînés sont disponibles. Le second utilise des règles et des seuils adaptés au type de machine, par exemple pour la température, la vibration, la durée d’utilisation, la vitesse du moteur et les erreurs signalées. Cette combinaison permet de produire un résultat exploitable dans le prototype tout en conservant une interprétation simple des principaux facteurs de risque.
 
-Le score de santé est calculé à partir du risque estimé. Un score élevé indique une machine considérée comme saine, tandis qu’un score faible signale un besoin de surveillance ou d’intervention. Les cartes de prédiction du tableau de bord permettent de consulter rapidement les machines présentant le risque le plus important.
+Le risque de maintenance est estimé par le \textit{Random Forest Classifier} lorsqu’il est disponible, puis consolidé avec la logique de règles. Le score de santé est calculé à partir du risque estimé. Un score élevé indique une machine considérée comme saine dans le cadre des données simulées, tandis qu’un score faible signale un besoin de surveillance ou d’intervention. Les cartes de prédiction du tableau de bord permettent de consulter rapidement les machines présentant le risque le plus important.
 
 \begin{figure}[H]
 \centering

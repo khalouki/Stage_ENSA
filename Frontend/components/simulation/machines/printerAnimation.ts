@@ -33,6 +33,7 @@ type TickPrinterAnimationArgs = {
   syncCncMechanics: (toolWorldPos: THREE.Vector3, dt: number, immediate?: boolean) => void;
   tickPrinterBed: (isPrinting: boolean) => void;
   disableCncLaserEffect: (dt: number) => void;
+  onPrintComplete?: () => void;
   onPositionUpdate: (pos: { x: string; y: string; z: string }) => void;
   onProgressUpdate: (pct: number) => void;
 };
@@ -67,6 +68,7 @@ export function tickPrinterAnimation({
   syncCncMechanics,
   tickPrinterBed,
   disableCncLaserEffect,
+  onPrintComplete,
   onPositionUpdate,
   onProgressUpdate,
 }: TickPrinterAnimationArgs): void {
@@ -110,6 +112,7 @@ export function tickPrinterAnimation({
     disableCncLaserEffect(dt);
     tickPrinterBed(false);
     updatePrinterSampleObjectReveal(printedObjectReveal, 1);
+    onPrintComplete?.();
     onProgressUpdate(1);
     return;
   }

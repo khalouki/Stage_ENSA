@@ -50,12 +50,16 @@ import {
 } from "@/components/simulation/scene/sceneConstants";
 import {
   buildMachinePathAlignment,
+  configurePrinterModelShadows,
+  computePrinterPrintLayerWorldBounds,
   computePrinterMotionWorldBounds as computePrinterMotionWorldBoundsForMoves,
   createPrinterKinematics,
   createPrinterSurfaceReference,
   findPrinterBedObject,
+  parkPrinterMechanics,
   syncPrinterMechanics as syncPrinterMechanicsForTool,
   tickPrinterBed as tickPrinterBedForKinematics,
+  updatePrinterNozzleHeat,
 } from "@/components/simulation/machines/printerKinematics";
 import {
   PRINTER_BEAD_Y_OFFSET,
@@ -230,6 +234,7 @@ export function ThreeScene({
   const cncPrintStateRef = useRef<CncPrintAnimationState>(createCncPrintAnimationState());
   const printerKinematicsRef = useRef<PrinterKinematics | null>(null);
   const cncKinematicsRef = useRef<CncKinematics | null>(null);
+  const printerRetractingRef = useRef(false);
 
   const ghostLineRef = useRef<THREE.Line | null>(null);
   const activeSegRef = useRef<THREE.Object3D | null>(null);
@@ -619,7 +624,11 @@ export function ThreeScene({
     }
     tool.position.copy(firstWorld);
     tool.visible = true;
-    syncPrinterMechanics(firstWorld, 0, true);
+    if (machineType === "printer3d") {
+      parkPrinterMechanics(machineType, printerKinematicsRef.current, 0, true);
+    } else {
+      syncPrinterMechanics(firstWorld, 0, true);
+    }
     return true;
   }, [machineType, syncPrinterMechanics, toWorld]);
 
@@ -1214,7 +1223,16 @@ export function ThreeScene({
   const tick = useCallback(
     (dt: number) => {
       const anim = animRef.current;
-      if (!anim.playing || anim.moves.length < 2) return;
+      if (!anim.playing || anim.moves.length < 2) {
+        if (machineType === "printer3d" && printerRetractingRef.current) {
+          printerRetractingRef.current = !parkPrinterMechanics(
+            machineType,
+            printerKinematicsRef.current,
+            dt,
+          );
+        }
+        return;
+      }
 
       const scene = sceneRef.current;
       const tool = toolGroupRef.current;
@@ -1244,6 +1262,9 @@ export function ThreeScene({
           },
           tickPrinterBed,
           disableCncLaserEffect: (delta) => updateCncLaserEffect(cncLaserEffectRef.current, false, delta),
+          onPrintComplete: () => {
+            printerRetractingRef.current = true;
+          },
           onPositionUpdate: onPosRef.current,
           onProgressUpdate: onProgRef.current,
         });
@@ -1354,6 +1375,13 @@ export function ThreeScene({
     tickCallbackRef.current = tick;
   }, [tick]);
 
+  const isPrinterNozzleHeating = useCallback(() => {
+    if (machineType !== "printer3d") return false;
+    const anim = animRef.current;
+    if (!anim.playing || anim.moves.length < 2) return false;
+    return anim.moves[anim.moveIdx + 1]?.operation === "print";
+  }, [machineType]);
+
   const setupPrinterKinematics = useCallback(() => {
     if (machineType !== "printer3d") {
       printerKinematicsRef.current = null;
@@ -1410,6 +1438,7 @@ export function ThreeScene({
       last = now;
       controls.update();
       tickCallbackRef.current?.(dt);
+      updatePrinterNozzleHeat(printerKinematicsRef.current, isPrinterNozzleHeating(), dt);
       renderer.render(scene, camera);
     };
     frameRef.current = requestAnimationFrame(animate);
@@ -1425,7 +1454,7 @@ export function ThreeScene({
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
-  }, [updateToolVisualMode]);
+  }, [isPrinterNozzleHeating, updateToolVisualMode]);
 
   useEffect(() => {
     const container = mountRef.current;
@@ -1674,6 +1703,10 @@ export function ThreeScene({
       updatePrinterAnchor();
       if (printerKinematicsRef.current) {
         printerKinematicsRef.current.motionWorldBounds = computePrinterMotionWorldBounds();
+        printerKinematicsRef.current.printLayerWorldBounds = computePrinterPrintLayerWorldBounds(
+          moves,
+          toWorld,
+        );
       }
       if (cncKinematicsRef.current) {
         cncKinematicsRef.current.motionWorldBounds = computeCncMotionWorldBounds(
@@ -1699,6 +1732,9 @@ export function ThreeScene({
     }
 
     const readyToPlay = snapToolToFirstMove();
+    if (machineType === "printer3d" && readyToPlay) {
+      printerRetractingRef.current = false;
+    }
     if (machineType === "cnc" && readyToPlay) {
       const printState = cncPrintStateRef.current;
       const isAtStart =
@@ -1736,6 +1772,7 @@ export function ThreeScene({
     anim.moveIdx = 0;
     anim.segT = 0;
     anim.playing = false;
+    printerRetractingRef.current = false;
 
     clearPath();
     rebuildPathGeometry();
@@ -1790,12 +1827,16 @@ export function ThreeScene({
       // Center machine on X/Z origin and place it on the ground plane.
       model.position.set(-normalizedCenter.x, -normalizedBox.min.y, -normalizedCenter.z);
 
-      model.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          obj.castShadow = true;
-          obj.receiveShadow = true;
-        }
-      });
+      if (machineType === "printer3d") {
+        configurePrinterModelShadows(model);
+      } else {
+        model.traverse((obj) => {
+          if (obj instanceof THREE.Mesh) {
+            obj.castShadow = true;
+            obj.receiveShadow = true;
+          }
+        });
+      }
 
       scene.add(model);
       // Update world matrices now that the model is in the scene graph so that

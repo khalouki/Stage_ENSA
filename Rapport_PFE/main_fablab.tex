@@ -287,7 +287,7 @@ en Industrie 4.0
 \begin{minipage}[t]{0.45\textwidth}
   \flushright
   \textbf{Sous la direction de :}\\[4pt]
-  Pr. \textbf{Nom et Prénom}
+  Pr. \textbf{Soufiane BELHOUIDEG}
 \end{minipage}
 
 \vspace{0.5cm}
@@ -343,7 +343,7 @@ Enfin, j'adresse mes remerciements à ma famille et à toutes les personnes qui 
 
 Ce projet de fin d'études porte sur la conception et le développement d'une plateforme virtuelle de type FabLab intégrant la simulation 3D, l'Internet des Objets et la Data Science. La solution proposée permet de visualiser et de superviser des machines telles qu'une imprimante 3D et une machine CNC dans un environnement interactif.
 
-La plateforme repose sur une architecture moderne combinant une interface web, un backend applicatif, une simulation 3D et un module d'analyse de données. L'objectif est de proposer un environnement numérique permettant la gestion des machines, la simulation de leurs comportements, ainsi que l'exploitation des données générées pour la supervision intelligente et la maintenance prédictive.
+La plateforme repose sur une architecture moderne combinant une interface web, un backend applicatif, une simulation 3D, une télémétrie simulée via MQTT et un module d'analyse de données. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
 \textbf{Mots-clés :} FabLab, Industrie 4.0, Simulation 3D, IoT, MQTT, Data Science, Maintenance prédictive, CNC, Imprimante 3D.
 
@@ -352,7 +352,7 @@ La plateforme repose sur une architecture moderne combinant une interface web, u
 
 This final year project focuses on the design and development of a virtual FabLab platform integrating 3D simulation, Internet of Things technologies and Data Science. The proposed solution enables the visualization and supervision of machines such as a 3D printer and a CNC machine within an interactive environment.
 
-The platform is based on a modern architecture combining a web interface, an application backend, a 3D simulation module and a data analysis component. The main objective is to provide a digital environment for machine management, behavior simulation and intelligent data exploitation for monitoring and predictive maintenance.
+The platform is based on a modern architecture combining a web interface, an application backend, a 3D simulation module, MQTT-simulated telemetry and a data analysis component. In this version, telemetry data is simulated to validate the architecture, MQTT flows, monitoring and analytics module. The platform remains designed for later connection to real sensors.
 
 \textbf{Keywords:} FabLab, Industry 4.0, 3D Simulation, IoT, MQTT, Data Science, Predictive Maintenance, CNC, 3D Printer.
 
@@ -401,7 +401,7 @@ Les avancées technologiques liées à l'Industrie 4.0 transforment progressivem
 
 Cependant, l'utilisation classique d'un FabLab reste généralement limitée par la présence physique, la disponibilité des machines et l'absence d'outils numériques avancés pour la supervision et l'analyse des données. Dans ce contexte, la mise en place d'une plateforme virtuelle devient une solution pertinente pour améliorer l'accessibilité, la visualisation, la gestion et l'exploitation intelligente des équipements.
 
-Le présent projet vise à concevoir et développer une plateforme virtuelle FabLab intégrant une interface web moderne, une simulation 3D interactive, une communication IoT simulée via MQTT et un module de Data Science destiné à l'analyse des données machines et à la maintenance prédictive.
+Le présent projet vise à concevoir et développer une plateforme virtuelle FabLab intégrant une interface web moderne, une simulation 3D interactive, une communication IoT simulée via MQTT et un module de Data Science destiné à l'analyse des données machines et à la maintenance prédictive. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
 Ce rapport est organisé comme suit. Le premier chapitre présente l'organisme d'accueil ainsi que le cadre général du projet, la problématique et les objectifs visés. Le deuxième chapitre est consacré à l'analyse des besoins, à la conception du système et aux technologies utilisées. Le troisième chapitre détaille la réalisation et l'implémentation effective de la plateforme. Enfin, le quatrième chapitre présente la validation fonctionnelle, les résultats obtenus, les limites actuelles et les perspectives d'évolution de la solution.
 
@@ -414,17 +414,13 @@ Ce rapport est organisé comme suit. Le premier chapitre présente l'organisme d
 % ─── Conclusion générale ──────────────────────────────────────────
 \chapterstar{Conclusion générale}
 
-Ce projet de fin d'études s'inscrit dans le contexte de la transformation numérique des espaces de fabrication, notamment les FabLabs, où l'accès aux machines, la gestion des ressources et la supervision des équipements constituent des enjeux importants. L'objectif principal de ce travail était de concevoir et développer une plateforme web permettant de gérer un FabLab virtuel, de visualiser les machines, de simuler certains comportements de fabrication et de préparer une évolution vers l'intégration de l'IoT et de la Data Science.
+Ce projet de fin d'études avait pour objectif de concevoir et de réaliser une plateforme web de FabLab virtuel intelligent, destinée à faciliter la gestion des machines, la visualisation de l'environnement de fabrication et la supervision des équipements dans un contexte académique.
 
-La solution développée repose sur une architecture moderne séparant le frontend et le backend. Le frontend, réalisé avec Next.js, assure l'interface utilisateur, la navigation, les pages de gestion, le laboratoire virtuel et les modules de simulation. Le backend, développé avec FastAPI, prend en charge les API REST, l'authentification, la logique métier, la gestion des machines, des utilisateurs et des réservations. La persistance des données est assurée par SQLite, ce qui offre une base simple et adaptée au contexte académique du projet. La plateforme intègre également une simulation 3D permettant de représenter l'environnement du FabLab et de visualiser des machines telles que la CNC et l'imprimante 3D.
+Les travaux réalisés ont permis de mettre en place une plateforme web fonctionnelle intégrant une simulation 3D du FabLab, un système de communication basé sur le protocole MQTT pour la réception des données de télémétrie, ainsi qu'un module Data Science dédié à l'analyse de l'état des machines. Un tableau de bord administrateur complète la solution en assurant le suivi des équipements, des réservations et des principaux indicateurs de supervision.
 
-Les objectifs fixés au début du projet ont été globalement atteints. Une interface utilisateur fonctionnelle a été réalisée, avec des parcours adaptés aux étudiants et aux administrateurs. La gestion des machines permet d'organiser les équipements du FabLab, tandis que le module de réservation offre la possibilité de demander des créneaux d'utilisation. Les simulations CNC et imprimante 3D apportent une dimension pédagogique à la plateforme en permettant d'observer le principe de fonctionnement des machines numériques. La communication entre le frontend et le backend a été centralisée à travers une fonction d'appel API, ce qui améliore la cohérence des échanges et facilite la maintenance du code. L'architecture modulaire du projet constitue également un point important, car elle permet d'envisager des évolutions futures sans remettre en cause toute la structure existante.
+Dans la version actuelle, les données de télémétrie utilisées sont simulées. Cette approche a permis de valider l'architecture globale de la solution, les flux de communication MQTT, le stockage des données et le fonctionnement du module d'analyse. Elle constitue ainsi une base expérimentale pour une future intégration dans un environnement réel.
 
-Cependant, certaines limites doivent être soulignées. Les données de télémétrie utilisées dans le projet restent simulées. Elles permettent de valider le principe général de supervision et de préparer les traitements futurs, mais elles ne remplacent pas des mesures réelles issues de capteurs physiques. De plus, la plateforme n'est pas encore connectée à de vraies machines IoT. Les scénarios liés à MQTT, à la supervision et à l'analyse de données restent donc à valider dans un environnement matériel réel. Enfin, la simulation 3D proposée reste une représentation pédagogique : elle ne reproduit pas totalement le comportement physique des machines, notamment les contraintes mécaniques, les vibrations, les erreurs de fabrication ou les effets thermiques.
-
-Plusieurs perspectives peuvent être envisagées pour prolonger ce travail. La première consiste à intégrer une communication MQTT réelle avec des machines ou des microcontrôleurs connectés. L'ajout de capteurs IoT permettrait de collecter des données physiques comme la température, la vibration ou la vitesse de fonctionnement. Ces données pourraient ensuite alimenter un dashboard analytique plus avancé, capable de présenter des courbes, des alertes et des indicateurs de performance. La maintenance prédictive représente également une perspective importante, à condition de disposer d'un historique de données réel et suffisamment riche. Enfin, la simulation pourrait être améliorée afin de devenir plus précise, plus interactive et plus proche du comportement réel des machines de fabrication numérique.
-
-En conclusion, la plateforme Virtual FabLab réalisée dans ce projet constitue une base fonctionnelle et évolutive. Elle montre comment le développement web, la simulation 3D, l'architecture API, l'IoT simulé et la Data Science peuvent être combinés dans un même environnement académique. Même si certaines fonctionnalités restent à approfondir ou à valider avec du matériel réel, le projet atteint son objectif principal : proposer une plateforme numérique capable d'améliorer la gestion, la visualisation et la préparation à la supervision intelligente d'un FabLab.
+Les perspectives de ce projet concernent principalement la connexion de la plateforme à des capteurs et à des machines réelles, son déploiement dans un FabLab opérationnel, ainsi que l'exploitation de données réelles pour améliorer et valider les modèles Data Science. Ces évolutions permettraient de renforcer les capacités de supervision intelligente et de faire évoluer la plateforme vers une solution de jumeau numérique plus complète, adaptée aux environnements de fabrication modernes.
 
 % ─── Bibliographie et webographie ─────────────────────────────────
 \clearpage

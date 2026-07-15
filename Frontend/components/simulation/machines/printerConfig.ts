@@ -72,6 +72,11 @@ export type PrinterKinematics = {
     minZ: number;
     maxZ: number;
   };
+  printLayerWorldBounds: {
+    minZ: number;
+    maxZ: number;
+  };
+  modelWorldScaleY: number;
 };
 
 export type PrintSegmentDescriptor = {
