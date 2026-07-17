@@ -1,7 +1,7 @@
 from datetime import date, datetime, time, timedelta
 
 from fastapi import HTTPException, status
-from sqlmodel import Session, select
+from sqlmodel import Session, func, select
 
 from app.models.machine import Machine
 from app.models.notification import Notification
@@ -115,6 +115,14 @@ def list_all_reservations(session: Session) -> list[tuple[Reservation, User, Mac
         .order_by(Reservation.created_at.desc())
     ).all()
     return list(rows)
+
+
+def count_pending_reservations(session: Session) -> int:
+    return int(
+        session.exec(
+            select(func.count(Reservation.id)).where(Reservation.status == ReservationStatus.PENDING)
+        ).one()
+    )
 
 
 def set_reservation_status(

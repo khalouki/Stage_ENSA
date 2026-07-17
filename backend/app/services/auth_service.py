@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, select
 
-from app.core.security import create_access_token, decode_token, get_password_hash, verify_password
+from app.core.security import create_access_token, get_password_hash, safe_decode_token, verify_password
 from app.db import get_session
 from app.models.user import User, UserRole
 from app.schemas.auth import AuthUser, PasswordChangeRequest, ProfileUpdateRequest, TokenResponse
@@ -79,7 +79,10 @@ def get_current_user(
         detail="Could not validate credentials",
     )
 
-    payload = decode_token(token)
+    payload = safe_decode_token(token)
+    if payload is None:
+        raise credentials_exception
+
     user_id_raw = payload.get("sub")
     if user_id_raw is None:
         raise credentials_exception

@@ -10,6 +10,7 @@ from app.models.sensor import MachineSensorReading
 from app.schemas.ai import AIMetricFactorRead, FleetMonitoringAIRead, MachineMonitoringAIRead, TelemetrySnapshotRead
 from app.schemas.telemetry import MachineStateRead
 from app.services.anomaly_service import AnomalyDetectionService, MonitoringProfile, resolve_monitoring_profile
+from app.services.copilot_localization import copilot_text
 from app.services.machine_service import get_machine, list_machines
 from app.services.ml_model_service import ml_model_service
 from app.services.telemetry_service import latest_state, telemetry_history
@@ -55,7 +56,7 @@ class PredictiveMaintenanceService:
                 status=machine.status.value,
                 has_telemetry=False,
                 anomaly_status="no_data",
-                recommendation="No telemetry has been received yet. Publish sensor data or MQTT updates to enable AI monitoring.",
+                recommendation=copilot_text("predictive_no_telemetry"),
                 telemetry_points=0,
                 assessed_at=datetime.now(timezone.utc),
                 model_used="fallback",
@@ -155,43 +156,43 @@ class PredictiveMaintenanceService:
         factors = [
             AIMetricFactorRead(
                 key="temperature",
-                label="Temperature load",
+                label=copilot_text("factor_temperature"),
                 score=temperature_score,
                 weight=28,
                 current_value=round(state.temperature, 2),
                 unit="C",
-                detail=f"Normal operating band stays below {profile.temp_warning:.0f} C for this machine family.",
+                detail=copilot_text("detail_temperature", threshold=profile.temp_warning),
             ),
             AIMetricFactorRead(
                 key="vibration",
-                label="Mechanical vibration",
+                label=copilot_text("factor_vibration"),
                 score=vibration_score,
                 weight=28,
                 current_value=round(state.vibration, 3),
                 unit="mm/s",
-                detail=f"Persistent vibration above {profile.vibration_warning:.1f} mm/s increases maintenance risk.",
+                detail=copilot_text("detail_vibration", threshold=profile.vibration_warning),
             ),
             AIMetricFactorRead(
                 key="runtime",
-                label="Accumulated usage",
+                label=copilot_text("factor_runtime"),
                 score=runtime_score,
                 weight=22,
                 current_value=round(runtime_hours, 1),
                 unit="h",
-                detail=f"Preventive maintenance is usually scheduled around {profile.maintenance_interval_hours:.0f} h.",
+                detail=copilot_text("detail_runtime", hours=profile.maintenance_interval_hours),
             ),
             AIMetricFactorRead(
                 key="errors",
-                label="Recent error history",
+                label=copilot_text("factor_errors"),
                 score=error_score,
                 weight=12,
                 current_value=float(recent_error_count),
                 unit="events",
-                detail="Repeated error flags in recent telemetry strongly increase the failure risk.",
+                detail=copilot_text("detail_errors"),
             ),
             AIMetricFactorRead(
                 key="trend",
-                label="Telemetry trend",
+                label=copilot_text("factor_trend"),
                 score=trend_score,
                 weight=10,
                 detail=trend_label,
@@ -214,7 +215,7 @@ class PredictiveMaintenanceService:
     @staticmethod
     def _trend_score(history: list[MachineSensorReading]) -> tuple[int, str]:
         if len(history) < 6:
-            return (0, "Not enough telemetry history yet to evaluate the recent trend.")
+            return (0, copilot_text("detail_trend_insufficient"))
 
         chronological = list(reversed(history))
         midpoint = len(chronological) // 2
@@ -230,10 +231,10 @@ class PredictiveMaintenanceService:
         trend_score = min(10, int(round((temp_increase * 0.3) + (vibration_increase * 6.0))))
 
         if trend_score == 0:
-            return (0, "Recent telemetry remains stable compared with the previous readings.")
+            return (0, copilot_text("detail_trend_stable"))
         return (
             trend_score,
-            f"Temperature and vibration are rising versus the previous window (+{temp_increase:.1f} C, +{vibration_increase:.2f} mm/s).",
+            copilot_text("detail_trend_rising", temp=temp_increase, vibration=vibration_increase),
         )
 
     @staticmethod
@@ -260,15 +261,15 @@ class PredictiveMaintenanceService:
         factors: list[AIMetricFactorRead],
     ) -> str:
         if not anomalies and risk_level == "low":
-            return f"{machine_name} is operating normally. Keep routine inspection and continue collecting telemetry."
+            return copilot_text("rec_healthy", machine=machine_name)
 
         top_factor = max(factors, key=lambda item: item.score, default=None)
         if risk_level == "high":
             if top_factor:
-                return f"{machine_name} should be inspected before the next student session. Prioritize {top_factor.label.lower()} and verify critical components."
-            return f"{machine_name} should be inspected before the next student session."
+                return copilot_text("rec_high_factor", machine=machine_name, factor=top_factor.label.lower())
+            return copilot_text("rec_high", machine=machine_name)
         if risk_level == "medium":
             if top_factor:
-                return f"Plan preventive maintenance soon for {machine_name}. Focus on {top_factor.label.lower()} and monitor the next telemetry updates."
-            return f"Plan preventive maintenance soon for {machine_name}."
-        return f"{machine_name} remains usable, but keep it under observation and review the next telemetry cycle."
+                return copilot_text("rec_medium_factor", machine=machine_name, factor=top_factor.label.lower())
+            return copilot_text("rec_medium", machine=machine_name)
+        return copilot_text("rec_low_observe", machine=machine_name)

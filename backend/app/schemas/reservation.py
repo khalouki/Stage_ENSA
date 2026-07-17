@@ -41,6 +41,10 @@ class ReservationWithDetails(ReservationRead):
     machine_name: str
 
 
+class ReservationPendingCountRead(BaseModel):
+    pending_count: int
+
+
 class ReservationDecision(BaseModel):
     note: str | None = None
 

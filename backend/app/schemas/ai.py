@@ -68,3 +68,47 @@ class FleetMonitoringAIRead(BaseModel):
     critical_count: int
     average_health_score: float | None = None
     machines: list[MachineMonitoringAIRead]
+
+
+CopilotIntent = Literal[
+    "fablab_summary",
+    "machine_status",
+    "explain_machine_health",
+    "highest_risk_machine",
+    "compare_machines",
+    "recent_anomalies",
+    "maintenance_recommendation",
+    "reservation_summary",
+    "help",
+    "unknown",
+]
+
+CopilotSeverity = Literal["info", "warning", "critical"]
+
+
+class CopilotQueryRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=500)
+
+
+class CopilotDataPoint(BaseModel):
+    label: str
+    value: str | int | float | None
+    unit: str | None = None
+
+
+class CopilotExtractedMachine(BaseModel):
+    id: int
+    name: str
+
+
+class CopilotQueryResponse(BaseModel):
+    answer: str
+    intent: CopilotIntent
+    machine_id: int | None = None
+    severity: CopilotSeverity = "info"
+    confidence: float = Field(default=0.0, ge=0, le=1)
+    low_confidence: bool = False
+    extracted_machines: list[CopilotExtractedMachine] = Field(default_factory=list)
+    data_points: list[CopilotDataPoint] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    generated_at: datetime

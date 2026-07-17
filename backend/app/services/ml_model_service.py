@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from app.models.sensor import MachineSensorReading
+from app.services.copilot_localization import copilot_text
 from app.schemas.telemetry import MachineStateRead
 
 logger = logging.getLogger(__name__)
@@ -225,12 +226,12 @@ class MLModelService:
     @staticmethod
     def _recommendation(status: str, anomaly: bool) -> str:
         if status == "critical":
-            return "Stop or isolate the machine and schedule immediate inspection before the next FabLab session."
+            return copilot_text("ml_rec_critical")
         if status == "maintenance_soon":
-            return "Plan preventive maintenance soon and watch the next telemetry updates closely."
+            return copilot_text("ml_rec_maintenance")
         if status == "monitor" or anomaly:
-            return "Machine can remain available, but keep it under monitoring and review sensor trends."
-        return "Machine appears healthy. Continue normal operation and routine inspection."
+            return copilot_text("ml_rec_monitor")
+        return copilot_text("ml_rec_healthy")
 
 
 ml_model_service = MLModelService()

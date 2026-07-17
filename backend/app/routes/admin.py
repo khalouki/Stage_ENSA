@@ -5,11 +5,21 @@ from app.db import get_session
 from app.models.machine import Machine
 from app.models.reservation import ReservationStatus
 from app.models.user import User
-from app.schemas.reservation import ReservationDecision, ReservationRead, ReservationWithDetails
+from app.schemas.reservation import (
+    ReservationDecision,
+    ReservationPendingCountRead,
+    ReservationRead,
+    ReservationWithDetails,
+)
 from app.schemas.user import UserListRead, UserRead, UserUpdate
 from app.services.auth_service import require_admin
 from app.services.notification_service import create_reservation_status_notification
-from app.services.reservation_service import delete_reservation, list_all_reservations, set_reservation_status
+from app.services.reservation_service import (
+    count_pending_reservations,
+    delete_reservation,
+    list_all_reservations,
+    set_reservation_status,
+)
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
@@ -28,6 +38,16 @@ def get_all_reservations(session: Session = Depends(get_session)) -> list[Reserv
             )
         )
     return response
+
+
+@router.get("/reservation-stats/pending-count", response_model=ReservationPendingCountRead)
+def get_pending_reservation_count(session: Session = Depends(get_session)) -> ReservationPendingCountRead:
+    return ReservationPendingCountRead(pending_count=count_pending_reservations(session))
+
+
+@router.get("/reservations/pending-count", response_model=ReservationPendingCountRead)
+def get_pending_reservation_count_legacy(session: Session = Depends(get_session)) -> ReservationPendingCountRead:
+    return ReservationPendingCountRead(pending_count=count_pending_reservations(session))
 
 
 @router.put("/reservations/{reservation_id}/approve", response_model=ReservationRead)

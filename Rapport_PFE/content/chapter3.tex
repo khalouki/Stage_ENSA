@@ -30,20 +30,27 @@ Le projet est organisé en trois parties principales : le frontend, le backend e
 \small
 \caption{Organisation générale du projet}
 \label{tab:organisation-projet}
-\begin{tabular}{p{0.28\textwidth} p{0.62\textwidth}}
-\toprule
+\begin{tabular}{|p{0.28\textwidth}|p{0.62\textwidth}|}
+\hline
 \rowcolor{SectionColor!12}
 \textbf{Dossier} & \textbf{Rôle} \\
-\midrule
+\hline
 \texttt{Frontend/app} & Pages principales de l’application Next.js : accueil, lab 3D, simulation, dashboard, réservations, utilisateurs et profil. \\
+\hline
 \texttt{Frontend/components} & Composants réutilisables : layout, authentification, scène 3D, simulation, tableaux de bord et composants UI. \\
+\hline
 \texttt{Frontend/lib} & Fonctions utilitaires, appels API, traductions et moteur d’interprétation des fichiers G-code/NC. \\
+\hline
 \texttt{backend/app/routes} & Définition des endpoints FastAPI par domaine fonctionnel. \\
+\hline
 \texttt{backend/app/services} & Logique métier : authentification, machines, réservations, télémétrie, MQTT, anomalies et prédiction. \\
+\hline
 \texttt{backend/app/models} & Modèles SQLModel représentant les entités persistées. \\
+\hline
 \texttt{backend/scripts} & Scripts de simulation MQTT et d’entraînement des modèles de Machine Learning. \\
+\hline
 \texttt{Rapport\_PFE} & Sources LaTeX du rapport académique. \\
-\bottomrule
+\hline
 \end{tabular}
 \end{table}
 
@@ -219,39 +226,35 @@ Le message contient l’identifiant de la machine, la température, la vibration
 \label{fig:mqtt-flow-real}
 \end{figure}
 
-\section{Tableau de bord Data Science}
+\section{Tableau de bord de supervision}
 
 Le tableau de bord administrateur centralise les informations de supervision. Il affiche l’état de la connexion MQTT, la fraîcheur des données, le nombre d’utilisateurs, le nombre de machines, les réservations en attente et les résultats de monitoring intelligent.
 
-Le module Data Science exploite les mesures simulées reçues via MQTT afin de produire :
+Sur le plan de l’implémentation, le frontend interroge les endpoints administrateur du backend afin d’afficher les résultats calculés par les services d’analyse. Les éléments restitués incluent notamment :
 
 \begin{itemize}
     \item un statut d’anomalie par machine ;
     \item un score de santé sur 100 ;
     \item un niveau de risque de maintenance ;
-    \item une probabilité indicative de panne ;
+    \item une probabilité indicative de risque ;
     \item une recommandation de maintenance ;
     \item des facteurs explicatifs tels que température, vibration, durée d’utilisation, vitesse du moteur et erreurs récentes.
 \end{itemize}
 
-Sur le plan technique, la détection d’anomalies utilise un modèle \textit{Isolation Forest}. L’estimation du risque de panne ou de maintenance s’appuie sur un \textit{Random Forest Classifier}. Le score de santé, le niveau de risque et les recommandations sont complétés par une logique par règles, afin de rendre les résultats exploitables même lorsque les modèles entraînés ne sont pas disponibles ou lorsque des seuils métier doivent être pris en compte.
-
-Les caractéristiques analysées sont \texttt{temperature}, \texttt{vibration}, \texttt{usage\_duration} convertie en \texttt{usage\_hours}, \texttt{motor\_speed} et l’historique des erreurs. Les sorties exposées au tableau de bord et aux endpoints d’analyse sont le statut d’anomalie, la probabilité indicative de panne, le score de santé, le niveau de risque et une recommandation de maintenance.
+Les principes scientifiques, les caractéristiques utilisées, les modèles Machine Learning et les limites de validation sont détaillés dans le chapitre suivant afin d’éviter la duplication entre l’implémentation logicielle et la contribution analytique.
 
 \begin{figure}[H]
 \centering
 \IfFileExists{images/screenshot_dashboard_ds.png}
 {\includegraphics[width=0.95\textwidth]{images/screenshot_dashboard_ds.png}}
 {\fbox{\parbox[c][5.5cm][c]{0.85\textwidth}{\centering Emplacement réservé pour le tableau de bord Data Science\\\texttt{images/screenshot\_dashboard\_ds.png}}}}
-\caption{Tableau de bord administrateur et monitoring intelligent}
+\caption{Tableau de bord administrateur et supervision intelligente}
 \label{fig:screenshot-dashboard-ds}
 \end{figure}
 
-\section{Alertes d’anomalies et score de santé}
+\section{Cartes de prédiction et historique de télémétrie}
 
-La détection des anomalies repose sur deux niveaux. Le premier exploite le modèle \textit{Isolation Forest} lorsque les fichiers de modèles entraînés sont disponibles. Le second utilise des règles et des seuils adaptés au type de machine, par exemple pour la température, la vibration, la durée d’utilisation, la vitesse du moteur et les erreurs signalées. Cette combinaison permet de produire un résultat exploitable dans le prototype tout en conservant une interprétation simple des principaux facteurs de risque.
-
-Le risque de maintenance est estimé par le \textit{Random Forest Classifier} lorsqu’il est disponible, puis consolidé avec la logique de règles. Le score de santé est calculé à partir du risque estimé. Un score élevé indique une machine considérée comme saine dans le cadre des données simulées, tandis qu’un score faible signale un besoin de surveillance ou d’intervention. Les cartes de prédiction du tableau de bord permettent de consulter rapidement les machines présentant le risque le plus important.
+Les cartes de prédiction du tableau de bord permettent de consulter rapidement les machines présentant un besoin de surveillance. Elles affichent les résultats déjà calculés par le backend : score de santé, probabilité indicative, niveau de risque et recommandation synthétique. Cette partie relève de l’intégration applicative, tandis que le détail des modèles est présenté séparément dans le chapitre consacré au module Data Science et IA.
 
 \begin{figure}[H]
 \centering
@@ -261,8 +264,6 @@ Le risque de maintenance est estimé par le \textit{Random Forest Classifier} lo
 \caption{Cartes de prédiction et score de santé des machines}
 \label{fig:screenshot-prediction-cards}
 \end{figure}
-
-\section{Graphiques et historique de télémétrie}
 
 Les pages de détail des machines exploitent l’historique des mesures stockées pour afficher l’évolution de certains indicateurs, notamment la température. Cette visualisation permet à l’administrateur de suivre l’état récent d’une machine et de relier les alertes à une série temporelle.
 
@@ -274,6 +275,12 @@ Les pages de détail des machines exploitent l’historique des mesures stockée
 \caption{Historique des mesures d’une machine}
 \label{fig:screenshot-telemetry-history}
 \end{figure}
+
+\section{Intégration technique du Copilote IA}
+
+L’espace administrateur intègre une interface flottante de type chatbot appelée Assistant IA de Maintenance. Cette interface est chargée dans le layout de l’application, mais elle n’est affichée que lorsque l’utilisateur connecté possède le rôle \texttt{admin}. Elle conserve l’historique de conversation localement dans l’état React du composant et envoie les questions au backend à travers l’endpoint \texttt{/admin/ai/copilot/query}.
+
+Le frontend affiche la réponse structurée retournée par le backend : intention reconnue, niveau de sévérité, confiance, texte de synthèse, points de données et recommandations. Cette intégration fournit un accès conversationnel aux informations du tableau de bord, sans transformer le système en modèle génératif. Le fonctionnement scientifique du classifieur d’intentions et la génération déterministe des réponses sont détaillés dans le chapitre suivant.
 
 \section{Communication entre frontend et backend}
 
@@ -296,6 +303,6 @@ Les interfaces réalisées couvrent les principaux parcours utilisateurs : accue
 
 \section{Conclusion}
 
-Ce chapitre a présenté la réalisation technique de la plateforme Virtual FabLab. L’implémentation couvre la gestion des utilisateurs, des machines et des réservations, la visualisation du laboratoire en 3D, la simulation CNC et imprimante 3D, l’ingestion MQTT et le tableau de bord Data Science.
+Ce chapitre a présenté la réalisation technique de la plateforme Virtual FabLab. L’implémentation couvre la gestion des utilisateurs, des machines et des réservations, la visualisation du laboratoire en 3D, la simulation CNC et imprimante 3D, l’ingestion MQTT, le tableau de bord de supervision et l’intégration technique du Copilote IA.
 
-Le chapitre suivant approfondira l’exploitation des données IoT et l’intégration de la Data Science, en détaillant les données utilisées, les modèles de détection, les recommandations de maintenance et les limites de l’approche adoptée.
+Le chapitre suivant approfondira l’exploitation des données IoT et l’intégration de la Data Science et de l’IA, en détaillant les données utilisées, les modèles de détection, la classification d’intentions, les recommandations de maintenance et les limites de l’approche adoptée.

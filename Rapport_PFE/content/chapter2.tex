@@ -48,7 +48,8 @@ Les fonctionnalités attendues pour l’administrateur sont les suivantes :
     \item superviser les données de télémétrie reçues ;
     \item suivre l’état MQTT du système ;
     \item consulter les alertes d’anomalies ;
-    \item consulter les scores de santé et les recommandations de maintenance.
+    \item consulter les scores de santé et les recommandations de maintenance ;
+    \item interroger un Copilote IA de maintenance pour obtenir une synthèse structurée fondée sur les données disponibles.
 \end{itemize}
 
 \section{Besoins non fonctionnels}
@@ -118,7 +119,7 @@ La plateforme est structurée autour des modules suivants :
     \item \textbf{Module FabLab 3D} : visualisation interactive de la salle et des machines avec sélection et consultation de leur état.
     \item \textbf{Module simulation} : importation et interprétation des fichiers G-code ou NC pour l’imprimante 3D et la CNC.
     \item \textbf{Module MQTT} : réception des données simulées publiées sur les topics machines.
-    \item \textbf{Module Data Science} : détection d’anomalies avec Isolation Forest, estimation du risque de panne avec Random Forest Classifier, calcul du score de santé, niveau de risque et recommandations par logique de règles.
+    \item \textbf{Module Data Science et IA} : détection d’anomalies avec Isolation Forest, estimation du risque de maintenance avec Random Forest Classifier, calcul du score de santé, classification supervisée des intentions administrateur et Copilote IA d’aide à la décision.
     \item \textbf{Module notifications} : notification des étudiants après validation ou refus d’une réservation.
 \end{itemize}
 
@@ -157,9 +158,11 @@ Dans l’implémentation actuelle, la télémétrie simulée est reçue sous for
 
 \subsection{Conception de l’analyse intelligente}
 
-Le module Data Science combine des modèles entraînés avec scikit-learn et une logique par règles. La détection d’anomalies s’appuie sur un modèle \textit{Isolation Forest}, tandis que l’estimation du risque de panne ou de maintenance repose sur un \textit{Random Forest Classifier}. Une logique complémentaire par règles est utilisée pour consolider le score de santé, le niveau de risque et les recommandations de maintenance, notamment lorsque les modèles ne sont pas disponibles ou lorsqu’une lecture doit être interprétée de manière explicable.
+Le module Data Science et IA combine des modèles entraînés avec scikit-learn et une logique par règles. La détection d’anomalies s’appuie sur un modèle \textit{Isolation Forest}, tandis que l’estimation du risque de maintenance repose sur un \textit{Random Forest Classifier}. Une logique complémentaire par règles est utilisée pour consolider le score de santé, le niveau de risque et les recommandations de maintenance, notamment lorsque les modèles ne sont pas disponibles ou lorsqu’une lecture doit être interprétée de manière explicable.
 
-Les variables analysées sont la température, la vibration, la durée d’utilisation exprimée sous forme \texttt{usage\_duration} puis convertie en \texttt{usage\_hours}, la vitesse du moteur \texttt{motor\_speed} et l’historique des erreurs signalées. Les sorties produites par le module sont le statut d’anomalie, la probabilité indicative de panne, le score de santé, le niveau de risque et une recommandation de maintenance.
+Les variables analysées sont la température, la vibration, la durée d’utilisation exprimée sous forme \texttt{usage\_duration} puis convertie en \texttt{usage\_hours}, la vitesse du moteur \texttt{motor\_speed} et l’historique des erreurs signalées. Les sorties produites par le module sont le statut d’anomalie, la probabilité indicative de risque, le score de santé, le niveau de risque et une recommandation de maintenance.
+
+Le même module intègre également une classification supervisée des intentions administrateur, fondée sur TF-IDF et Logistic Regression, afin d’alimenter un Copilote IA de maintenance. Ce copilote ne correspond pas à un LLM ni à une IA générative ; il fournit des réponses déterministes construites à partir des données de la plateforme, des résultats analytiques et de l’intention reconnue.
 
 \section{Technologies utilisées}
 

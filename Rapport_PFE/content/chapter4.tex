@@ -1,108 +1,204 @@
-\chapter{Validation et résultats}
+\chapter{Validation et évaluation du système}
 
 \section{Introduction}
 
-Ce chapitre présente la validation fonctionnelle de la plateforme \textbf{Virtual FabLab}, les résultats obtenus, ainsi que les limites actuelles du travail réalisé. Après la description de l'implémentation dans le chapitre précédent, il s'agit ici de vérifier que les principales fonctionnalités répondent aux besoins définis : consultation du laboratoire virtuel, gestion des machines, réservation, simulation 3D, authentification, administration et communication entre le frontend et le backend.
+Ce chapitre présente la validation de la plateforme \textbf{Virtual FabLab} selon plusieurs axes complémentaires. L'objectif est d'évaluer le comportement du système réalisé, depuis les parcours fonctionnels jusqu'à l'intégration du module Data Science et Intelligence Artificielle, en cohérence avec l'architecture décrite dans les chapitres précédents.
 
-La validation effectuée reste adaptée au contexte d'un projet de fin d'études. Elle porte principalement sur le bon fonctionnement des parcours utilisateurs et administrateurs, ainsi que sur la cohérence des échanges entre les différentes couches de l'application. Les parties liées à l'IoT et à la Data Science sont abordées avec prudence, car elles reposent sur des données simulées par un simulateur MQTT. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
+L'évaluation porte ainsi sur la validation fonctionnelle de l'interface et du backend, la communication entre le frontend et l'API, la réception de la télémétrie MQTT, la persistance des données, la simulation 3D, les tests d'inférence des modèles Machine Learning, la classification d'intentions et l'intégration du Copilote IA de maintenance. Les résultats sont interprétés dans le cadre d'un environnement de test académique, sans prétendre à une validation industrielle sur machines physiques.
+
+\section{Stratégie de validation}
+
+La stratégie adoptée consiste à vérifier le système à plusieurs niveaux. Les fonctionnalités principales sont validées à travers des scénarios d'utilisation, des vérifications d'interface, des tests backend, des contrôles de flux MQTT, des consultations en base de données, des comportements de simulation et des tests d'intégration du module Data Science et IA.
+
+Trois types de validation sont distingués. La validation fonctionnelle vérifie que les parcours utilisateur et administrateur produisent les comportements attendus. L'évaluation chiffrée concerne les composants pour lesquels des métriques sont disponibles, en particulier le classifieur NLP. Enfin, la validation qualitative d'intégration vérifie que les modules communiquent correctement : télémétrie, analyse, tableau de bord et Copilote IA.
+
+Cette démarche permet d'apprécier la cohérence du prototype tout en conservant une distinction claire entre tests fonctionnels, tests d'intégration, validation d'inférence des modèles et évaluation quantitative.
 
 \section{Validation fonctionnelle de la plateforme}
 
-\subsection{Tests du frontend}
+\subsection{Validation du frontend}
 
-Les tests du frontend ont porté sur les interfaces développées avec Next.js. L'objectif était de vérifier que les pages principales sont accessibles, lisibles et cohérentes avec les rôles des utilisateurs. Les interfaces testées incluent notamment la page d'accueil, le laboratoire 3D, la page des machines, les réservations, le tableau de bord administrateur et les pages de gestion.
+La validation du frontend a concerné les interfaces développées avec Next.js. Les scénarios vérifiés portent sur la page de connexion, l'inscription, la navigation selon le rôle, la consultation des machines, la gestion des réservations, l'affichage des notifications, le tableau de bord de télémétrie et l'accès à l'interface de simulation 3D.
 
-La navigation a également été vérifiée afin de s'assurer que l'utilisateur peut passer d'un module à l'autre sans rupture de parcours. Les redirections vers la page de connexion sont déclenchées lorsque l'utilisateur n'est pas authentifié, tandis que les pages réservées à l'administrateur restent protégées pour les utilisateurs étudiants.
+Les pages réservées à l'administration sont accessibles uniquement après authentification et selon le rôle de l'utilisateur. Dans l'environnement de test, les redirections vers la page de connexion et l'affichage conditionnel des modules administrateur correspondent au comportement attendu. Les pages liées aux machines et aux réservations permettent également de vérifier la cohérence des informations retournées par le backend.
 
-La partie simulation 3D a été validée à travers le chargement de la scène du FabLab, la sélection des machines et la visualisation des actions associées. Les modules de simulation CNC et imprimante 3D ont été testés avec des fichiers de démonstration afin de vérifier l'affichage des trajectoires, la progression de la simulation et la gestion des fichiers non valides. Ces tests confirment le caractère opérationnel de la simulation dans un objectif pédagogique, même si elle ne reproduit pas encore l'ensemble des phénomènes physiques réels.
+La figure \ref{fig:dashboard-validation} illustre l'utilisation du tableau de bord pour centraliser les mesures, les indicateurs de supervision et les résultats liés au module Data Science.
 
-\subsection{Tests du backend FastAPI}
+\begin{figure}[H]
+\centering
+\IfFileExists{images/screenshot_dashboard_ds.png}
+{\includegraphics[width=0.88\textwidth]{images/screenshot_dashboard_ds.png}}
+{\fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering Emplacement réservé pour le tableau de bord de télémétrie\\\texttt{images/screenshot\_dashboard\_ds.png}}}}
+\caption{Tableau de bord de supervision et de télémétrie}
+\label{fig:dashboard-validation}
+\end{figure}
 
-La validation du backend FastAPI a concerné l'authentification, les routes protégées, les API REST et la gestion des erreurs. Le mécanisme d'authentification repose sur un jeton JWT généré lors de la connexion. Ce jeton permet ensuite d'accéder aux routes protégées selon le rôle de l'utilisateur.
+\subsection{Validation du backend}
 
-Les tests effectués ont permis de vérifier les comportements suivants :
+La validation du backend FastAPI a porté sur l'authentification, la protection JWT, les droits d'accès, les opérations de gestion et les réponses des endpoints. Les tests existants vérifient notamment le refus d'un jeton invalide, l'interdiction d'accès administrateur pour un utilisateur étudiant, l'accès autorisé pour un administrateur et la disponibilité des routes du Copilote IA.
 
-\begin{itemize}
-    \item création d'un compte utilisateur avec des données valides ;
-    \item connexion et récupération du jeton JWT ;
-    \item accès au profil de l'utilisateur connecté ;
-    \item protection des routes nécessitant une authentification ;
-    \item restriction des routes administrateur aux utilisateurs autorisés ;
-    \item création, consultation et traitement des réservations ;
-    \item consultation et gestion des machines selon les permissions.
-\end{itemize}
+Les opérations de gestion des réservations ont également été vérifiées. Les tests backend couvrent le comptage des réservations en attente, le passage d'une réservation à l'état approuvé et la mise à jour du compteur associé. Ces vérifications confirment que la logique de traitement des réservations reste cohérente avec les données persistées.
 
-La validation des requêtes a également été prise en compte. Lorsque les données envoyées sont incorrectes ou incomplètes, le backend retourne des erreurs adaptées. Les principaux cas traités concernent les erreurs d'authentification, les accès interdits, les ressources inexistantes et les conflits liés aux réservations. Cette gestion permet au frontend d'afficher des messages compréhensibles et d'éviter les comportements incohérents.
-
-\subsection{Communication frontend/backend}
-
-La communication entre le frontend et le backend est centralisée dans la fonction utilitaire \texttt{apiRequest}. Cette fonction joue un rôle important dans l'organisation du code, car elle évite de répéter la logique d'appel API dans chaque page ou composant.
-
-Son rôle consiste principalement à construire l'URL du backend, ajouter les en-têtes nécessaires aux échanges JSON, intégrer le token JWT lorsqu'il est disponible, puis traiter les réponses retournées par le backend. Lorsqu'une erreur HTTP est renvoyée, la fonction récupère le message d'erreur et le transforme en information exploitable par l'interface.
+La communication entre l'interface et le backend repose sur des requêtes HTTP structurées, centralisées côté frontend par une fonction utilitaire d'appel API. La figure \ref{fig:api-communication-validation} synthétise ce principe : l'interface transmet la requête, le backend applique les contrôles nécessaires, interagit avec la base de données ou les services concernés, puis retourne une réponse JSON ou une erreur exploitable par l'interface.
 
 \begin{figure}[H]
 \centering
 \IfFileExists{images/api_communication.png}
-{\includegraphics[width=0.9\textwidth]{images/api_communication.png}}
-{\fbox{\parbox[c][5cm][c]{0.85\textwidth}{\centering Emplacement réservé pour le schéma de communication frontend/backend\\\texttt{images/api\_communication.png}}}}
-\caption{Schéma de communication entre l'interface Next.js et le backend FastAPI}
+{\includegraphics[width=0.88\textwidth]{images/api_communication.png}}
+{\fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering Emplacement réservé pour le schéma de communication frontend/backend\\\texttt{images/api\_communication.png}}}}
+\caption{Communication entre l'interface Next.js et le backend FastAPI}
 \label{fig:api-communication-validation}
 \end{figure}
 
-La figure \ref{fig:api-communication-validation} illustre le principe général des échanges. Le frontend envoie une requête HTTP vers l'API FastAPI. Le backend valide la requête, applique la logique métier, interagit avec la base de données ou les services concernés, puis retourne une réponse JSON ou une erreur HTTP. Cette organisation rend la communication plus claire et facilite l'évolution de la plateforme.
+\subsection{Validation de la communication MQTT et de la télémétrie}
 
-\subsection{Évaluation fonctionnelle du module Data Science}
+La validation de la télémétrie concerne le flux suivant : simulateur MQTT, broker, backend, base de données, puis tableau de bord. Dans l'environnement de test, la télémétrie est simulée afin de vérifier le fonctionnement de la chaîne applicative avant une éventuelle connexion à des capteurs physiques.
 
-L'évaluation du module Data Science est une évaluation fonctionnelle du prototype. Elle ne vise pas à annoncer une précision industrielle, car les données utilisées sont simulées. L'objectif est de vérifier que le module est correctement intégré dans la chaîne applicative et qu'il produit des résultats cohérents avec les scénarios de télémétrie simulée.
+Les messages publiés contiennent les champs effectivement utilisés par l'application : \texttt{machine\_id}, \texttt{temperature}, \texttt{vibration}, \texttt{usage\_duration}, \texttt{motor\_speed}, \texttt{error}, \texttt{timestamp} et \texttt{status}. Le backend s'abonne au topic MQTT configuré, parse les messages JSON, identifie la machine concernée et persiste les mesures dans la table des lectures capteurs.
 
-Les vérifications réalisées portent sur les points suivants :
+Les tests réalisés vérifient la réception des messages, l'association des mesures à une machine, la persistance des lectures, la consultation du dernier état machine et l'affichage des informations dans le tableau de bord. Les informations d'erreur ou d'anomalie peuvent ensuite être exploitées par les services de monitoring et par le Copilote IA.
 
-\begin{itemize}
-    \item les messages MQTT publiés par le simulateur sont reçus par le backend ;
-    \item les mesures de télémétrie sont enregistrées dans la base de données SQLite ;
-    \item l'endpoint de prédiction retourne un statut d'anomalie, une probabilité indicative de panne, un score de santé, un niveau de risque et une recommandation ;
-    \item le tableau de bord affiche le score de santé, la probabilité de panne et les recommandations de maintenance ;
-    \item des alertes d'anomalies sont générées lorsque des valeurs anormales apparaissent dans la télémétrie simulée.
-\end{itemize}
+\subsection{Validation de la simulation 3D}
 
-Cette validation confirme l'intégration technique du module : ingestion MQTT, stockage, analyse et restitution dans l'interface administrateur. Elle reste toutefois fonctionnelle et ne doit pas être interprétée comme une mesure de performance prédictive sur machines réelles.
+La simulation 3D a été validée sur les deux équipements principaux du FabLab virtuel : l'imprimante 3D et la machine CNC. Les vérifications portent sur le chargement de la machine, l'interaction caméra, l'import de fichiers compatibles, l'interprétation des instructions, le mouvement progressif de l'outil et la visualisation de la trajectoire.
 
-\section{Résultats obtenus}
+Pour l'imprimante 3D, la validation concerne l'analyse de fichiers G-code, la progression de la tête d'impression, l'affichage de la position selon les axes, la visualisation progressive du dépôt et les contrôles de lecture, pause et réinitialisation. Pour la CNC, les tests portent sur l'interprétation de fichiers NC ou G-code compatibles, l'affichage du parcours d'outil, l'activation du mouvement de coupe, l'estimation du trajet et les contrôles d'animation.
 
-Les résultats obtenus montrent que la plateforme développée constitue un prototype fonctionnel répondant aux objectifs principaux du projet. L'application web permet à l'utilisateur de consulter les machines, accéder au laboratoire virtuel, effectuer des réservations et visualiser des simulations liées aux machines numériques.
+La figure \ref{fig:simulation-validation} présente l'interface de simulation utilisée pour observer les comportements validés. Cette simulation a une finalité pédagogique et interactive ; elle ne constitue pas une validation physique complète du comportement réel des machines.
 
-Du côté administrateur, la plateforme permet la gestion des machines, des utilisateurs et des réservations. La séparation entre le frontend Next.js et le backend FastAPI rend l'architecture plus claire et facilite la maintenance du projet. Les routes backend assurent la persistance des données, la sécurité et l'exposition des fonctionnalités sous forme d'API REST.
+\begin{figure}[H]
+\centering
+\IfFileExists{images/screenshot_lab_3d.png}
+{\includegraphics[width=0.86\textwidth]{images/screenshot_lab_3d.png}}
+{\fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering Emplacement réservé pour l'interface de simulation 3D\\\texttt{images/screenshot\_lab\_3d.png}}}}
+\caption{Interface de simulation 3D du FabLab virtuel}
+\label{fig:simulation-validation}
+\end{figure}
 
-La simulation 3D est opérationnelle pour représenter le FabLab virtuel et illustrer le comportement de machines telles que la CNC et l'imprimante 3D. Elle apporte une dimension visuelle et pédagogique importante au projet, en permettant à l'utilisateur d'interagir avec les machines avant une utilisation réelle.
+\section{Validation du module Data Science et IA}
 
-Enfin, le projet intègre un premier module intelligent fondé sur la télémétrie simulée. Ce module exploite Isolation Forest pour la détection d'anomalies, Random Forest Classifier pour l'estimation indicative du risque de panne, et une logique par règles pour le score de santé, le niveau de risque et les recommandations de maintenance. Il permet de démontrer l'orientation du système vers un FabLab connecté et intelligent sans prétendre à une validation industrielle complète.
+\subsection{Validation de l'Isolation Forest}
 
-\section{Limites actuelles et perspectives}
+La validation de l'Isolation Forest vise à vérifier le chargement du modèle, la préparation des entrées et la production d'un statut d'anomalie exploitable par le monitoring. Les variables utilisées sont celles définies dans le chapitre précédent : température, vibration, durée d'utilisation convertie en heures, vitesse du moteur et présence éventuelle d'une erreur.
 
-\subsection{Limites des données et validation}
+À l'inférence, le service applique le modèle chargé depuis l'artefact \texttt{joblib}, produit un indicateur d'anomalie et retourne un score associé. Ces sorties sont intégrées à l'évaluation de l'état machine et au tableau de bord. La validation porte donc sur le comportement d'inférence et l'intégration dans le workflow de supervision, sans introduire de métriques de classification non disponibles pour ce composant.
 
-Malgré les résultats obtenus, certaines limites doivent être mentionnées. La première concerne la télémétrie, qui reste simulée. Les données utilisées permettent de tester les flux, les interfaces, le stockage et le module d'analyse, mais elles ne remplacent pas des mesures réelles issues de capteurs installés sur des machines physiques.
+\subsection{Validation du Random Forest}
 
-Ainsi, les résultats du module Data Science sont indicatifs. Ils servent à valider le prototype, la cohérence des traitements et l'intégration entre MQTT, la base de données, les endpoints de prédiction et le tableau de bord. Ils ne permettent pas, à ce stade, d'affirmer une précision industrielle ou une capacité de généralisation sur de vraies machines.
+Le Random Forest est utilisé pour estimer le risque de maintenance à partir des mêmes variables d'entrée. La validation a porté sur la cohérence des entrées, la disponibilité des classes déclarées dans les métadonnées, la production d'une prédiction et l'exploitation de cette prédiction par l'application.
 
-La deuxième limite concerne l'absence de connexion directe avec de vraies machines IoT. Les scénarios de communication MQTT et de supervision sont préparés, mais ils nécessitent encore une validation avec des équipements réels. De même, la simulation 3D ne reproduit pas totalement le comportement réel des machines, notamment les contraintes mécaniques, les vibrations, les variations thermiques ou les défauts de fabrication.
+Les sorties utilisées par la plateforme comprennent notamment le statut de maintenance, une probabilité indicative de défaillance, un score de santé et une recommandation. Dans le cadre actuel, ces résultats servent à prioriser la surveillance et à enrichir le tableau de bord. Aucune métrique indépendante supplémentaire n'est ajoutée ici ; une évaluation quantitative sur un jeu de test plus large et indépendant reste une perspective de validation complémentaire.
 
-\subsection{Perspectives d'évolution}
+\subsection{Validation de la classification NLP}
 
-Plusieurs perspectives peuvent être envisagées pour améliorer la plateforme :
+La classification NLP du Copilote IA repose sur un pipeline classique combinant TF-IDF et Logistic Regression. L'objectif de la validation est de vérifier la capacité du classifieur à associer une question administrateur à une intention supportée, sans le présenter comme un modèle génératif ou un grand modèle de langage.
 
-\begin{itemize}
-    \item intégrer un broker MQTT réel et des messages provenant de machines physiques ;
-    \item ajouter des capteurs IoT pour collecter des mesures de température, vibration ou vitesse ;
-    \item enrichir la maintenance prédictive à partir de données historiques réelles ;
-    \item améliorer le réalisme de la simulation CNC et imprimante 3D ;
-    \item développer un dashboard analytique plus avancé avec des courbes, alertes et indicateurs de performance.
-\end{itemize}
+Le fichier d'évaluation disponible indique un corpus de 124 questions étiquetées, séparées en 86 exemples d'entraînement, 19 exemples de validation et 19 exemples de test. Les métriques disponibles sont présentées dans le tableau \ref{tab:validation-nlp-copilot}.
 
-Ces perspectives montrent que la solution actuelle peut servir de base évolutive. Elle permet déjà de valider l'architecture, les flux MQTT simulés, le stockage de la télémétrie et les principaux parcours fonctionnels, tout en laissant une marge d'amélioration importante vers une plateforme plus connectée et plus intelligente.
+\begin{table}[H]
+\centering
+\small
+\caption{Résultats d'évaluation du classifieur d'intentions}
+\label{tab:validation-nlp-copilot}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.34\textwidth}|>{\raggedright\arraybackslash}p{0.22\textwidth}|>{\raggedright\arraybackslash}p{0.22\textwidth}|}
+\hline
+\rowcolor{SectionColor!12}
+\textbf{Métrique} & \textbf{Validation} & \textbf{Test} \\
+\hline
+Accuracy & 0,4211 & 0,4211 \\
+\hline
+Précision macro & 0,4867 & 0,3500 \\
+\hline
+Rappel macro & 0,4833 & 0,4500 \\
+\hline
+F1-score macro & 0,4486 & 0,3800 \\
+\hline
+\end{tabular}
+\end{table}
+
+Ces résultats valident l'existence d'une chaîne NLP complète : constitution du corpus, vectorisation, apprentissage, séparation des données, calcul des métriques et matrice de confusion. Les performances restent liées à la taille et à la diversité du corpus ; leur amélioration pourra passer par l'ajout de formulations, de questions multilingues et de scénarios administrateur plus variés.
+
+\subsection{Validation du Copilote IA de maintenance}
+
+La validation du Copilote IA concerne son intégration applicative et son comportement dans les scénarios administrateur. Les tests existants vérifient l'accès réservé à l'administrateur, le refus d'un utilisateur non autorisé, la soumission d'une question, la classification d'intention, l'extraction d'entités machines, la récupération du contexte et la génération d'une réponse fondée sur les données disponibles.
+
+Les scénarios testés couvrent notamment la synthèse globale du FabLab, l'explication de l'état d'une machine, la recherche de la machine la plus risquée, la comparaison de machines, les anomalies récentes, les recommandations de maintenance et les questions non supportées. Le Copilote repose sur la classification d'intentions, le contexte métier, les données de télémétrie et les sorties des modèles ; il ne produit pas de raisonnement génératif libre.
+
+La figure \ref{fig:copilot-validation} montre l'interface représentative retenue pour illustrer l'intégration du Copilote IA dans le tableau de bord administrateur.
+
+\begin{figure}[H]
+\centering
+\IfFileExists{images/screenshot_copilot_interface.png}
+{\includegraphics[width=0.82\textwidth]{images/screenshot_copilot_interface.png}}
+{\fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering Emplacement réservé pour l'interface flottante du Copilote IA\\\texttt{images/screenshot\_copilot\_interface.png}}}}
+\caption{Interface du Copilote IA de maintenance réservé à l'administrateur}
+\label{fig:copilot-validation}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\caption{Synthèse de la validation du système}
+\label{tab:synthese-validation-systeme}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.35\textwidth}|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.11\textwidth}|}
+\hline
+\rowcolor{SectionColor!12}
+\textbf{Composant} & \textbf{Scénario de validation} & \textbf{Résultat observé} & \textbf{Statut} \\
+\hline
+Authentification & Connexion, génération du jeton JWT et accès au profil. & Les routes protégées nécessitent un jeton valide. & Validé \\
+\hline
+Gestion des utilisateurs & Accès différencié selon le rôle utilisateur. & Les accès administrateur sont restreints. & Validé \\
+\hline
+Gestion des machines & Consultation et gestion des machines depuis l'interface et l'API. & Les données machines sont exposées et exploitables. & Fonctionnel dans l'environnement de test \\
+\hline
+Réservations & Création, approbation et comptage des réservations en attente. & Les états et compteurs sont mis à jour correctement. & Validé \\
+\hline
+Notifications & Génération et affichage des informations liées aux actions utilisateur. & Les notifications accompagnent les parcours principaux. & Intégré et testé \\
+\hline
+Communication MQTT & Publication, réception et parsing des messages de télémétrie. & Les messages valides sont reçus et traités. & Fonctionnel dans l'environnement de test \\
+\hline
+Stockage de la télémétrie & Persistance des mesures associées aux machines. & Les lectures sont consultables par les endpoints de monitoring. & Validé \\
+\hline
+Tableau de bord & Affichage des états machines, scores et recommandations. & Les indicateurs de supervision sont centralisés. & Intégré et testé \\
+\hline
+Simulation imprimante 3D & Chargement du modèle, lecture G-code et animation progressive. & La trajectoire et la progression sont visibles. & Fonctionnel dans l'environnement de test \\
+\hline
+Simulation CNC & Lecture de fichiers compatibles, parcours d'outil et contrôles d'animation. & La simulation du mouvement d'outil est observable. & Fonctionnel dans l'environnement de test \\
+\hline
+Isolation Forest & Chargement du modèle et production d'un statut d'anomalie. & Le résultat est intégré au monitoring. & Intégré et testé \\
+\hline
+Random Forest & Vérification des entrées, classes et prédictions de risque. & Les sorties alimentent le score et les recommandations. & Intégré et testé \\
+\hline
+Classifieur NLP & Calcul des métriques et test des intentions supportées. & Les intentions sont évaluées sur validation et test. & Validé \\
+\hline
+Copilote IA & Accès administrateur, question, intention, entités et réponse contextualisée. & Les réponses restent fondées sur le contexte disponible. & Intégré et testé \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Discussion des résultats}
+
+Les résultats obtenus montrent que les principaux objectifs du projet ont été atteints dans le cadre de l'environnement étudié. La plateforme combine une interface web, un backend FastAPI, une base de données, un flux de télémétrie MQTT, une simulation 3D et un module Machine Learning au sein d'une architecture cohérente.
+
+L'intégration web permet de centraliser les fonctions de gestion du FabLab virtuel intelligent : machines, réservations, utilisateurs, notifications et supervision. Cette centralisation facilite le suivi des équipements et offre à l'administrateur une vue structurée de l'état du système.
+
+La partie Data Science et IA apporte une couche d'aide à la décision. La détection d'anomalies et la prédiction du risque de maintenance permettent d'orienter l'attention vers les machines nécessitant une surveillance particulière. Le Copilote IA de maintenance complète cette approche en offrant une interaction textuelle guidée, fondée sur des intentions, des entités machines et des données extraites de la plateforme.
+
+Les limites doivent toutefois être interprétées avec mesure. La télémétrie utilisée dans l'évaluation est simulée, le système n'a pas encore été déployé sur des machines réelles de FabLab, le corpus NLP reste limité et les modèles de maintenance nécessitent des jeux de données indépendants plus larges pour une évaluation quantitative complète. De plus, le comportement simulé peut différer du comportement physique de machines réelles, notamment pour les contraintes mécaniques, thermiques ou vibratoires.
+
+Ces éléments ne remettent pas en cause la cohérence du prototype. Ils indiquent plutôt les conditions nécessaires pour étendre l'évaluation. Les résultats constituent une validation de faisabilité dans l'environnement étudié et démontrent l'intégration technique des composants proposés, tandis qu'une validation plus large sur données réelles demeure une perspective naturelle.
+
+\section{Résultats globaux}
+
+Le projet aboutit à une plateforme web fonctionnelle permettant la consultation et l'administration d'un FabLab virtuel intelligent. Les rôles utilisateur et administrateur sont distingués, les machines et les réservations peuvent être gérées, et les informations de télémétrie sont ingérées, stockées et visualisées.
+
+La simulation 3D permet de représenter les équipements supportés, notamment l'imprimante 3D et la CNC, avec des contrôles d'animation et une visualisation progressive des trajectoires. Cette dimension renforce l'objectif pédagogique du projet en rendant les processus de fabrication plus accessibles.
+
+Le module Data Science et IA intègre la détection d'anomalies par Isolation Forest, la prédiction du risque de maintenance par Random Forest, la classification d'intentions par TF-IDF et Logistic Regression, ainsi qu'un Copilote IA de maintenance réservé à l'administrateur. Ces résultats contribuent à l'objectif général du projet : proposer une plateforme de FabLab virtuel capable de combiner supervision, simulation et aide à la décision.
 
 \section{Conclusion}
 
-Ce chapitre a présenté la validation fonctionnelle de la plateforme, les résultats obtenus ainsi que les limites actuelles du projet. Les tests réalisés confirment le fonctionnement des principaux modules : frontend, backend, authentification, gestion des machines, réservations, simulation 3D et communication API.
+Ce chapitre a présenté la validation du système selon plusieurs niveaux : frontend, backend, communication API, télémétrie MQTT, simulation 3D, modèles Machine Learning, classification NLP et Copilote IA de maintenance. Les vérifications réalisées confirment la cohérence de l'architecture intégrée et l'atteinte des principaux objectifs fonctionnels du projet.
 
-La plateforme Virtual FabLab répond ainsi aux objectifs essentiels du projet, tout en restant réaliste sur les limites liées à la simulation et à l'absence de machines IoT réelles. Elle intègre déjà un premier module intelligent de supervision et de maintenance prédictive indicative, dont la validation industrielle nécessitera des données issues de capteurs réels.
+Les résultats doivent rester contextualisés : la validation repose sur un environnement de test, des données de télémétrie simulées et un corpus NLP encore limité. Une généralisation vers un contexte opérationnel nécessitera une collecte sur machines réelles, des jeux de données plus larges et une évaluation quantitative complémentaire. Ces éléments préparent naturellement la conclusion générale, qui synthétise les apports du projet et ses perspectives d'évolution.

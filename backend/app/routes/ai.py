@@ -7,8 +7,9 @@ from fastapi import APIRouter, BackgroundTasks, Depends
 from sqlmodel import Session
 
 from app.db import get_session
-from app.schemas.ai import FleetMonitoringAIRead, MachineMonitoringAIRead
+from app.schemas.ai import CopilotQueryRequest, CopilotQueryResponse, FleetMonitoringAIRead, MachineMonitoringAIRead
 from app.services.auth_service import require_admin
+from app.services.copilot_service import answer_copilot_query
 from app.services.ml_model_service import ml_model_service
 from app.services.predictive_service import PredictiveMaintenanceService
 
@@ -24,6 +25,22 @@ def get_monitoring_overview(session: Session = Depends(get_session)) -> FleetMon
 @router.get("/monitoring/machines/{machine_id}", response_model=MachineMonitoringAIRead)
 def get_machine_monitoring(machine_id: int, session: Session = Depends(get_session)) -> MachineMonitoringAIRead:
     return predictive_service.get_machine_assessment(machine_id, session)
+
+
+@router.post("/copilot/query", response_model=CopilotQueryResponse)
+def query_copilot(
+    payload: CopilotQueryRequest,
+    session: Session = Depends(get_session),
+) -> CopilotQueryResponse:
+    return answer_copilot_query(payload.message, session)
+
+
+@router.post("/copilot", response_model=CopilotQueryResponse)
+def query_copilot_alias(
+    payload: CopilotQueryRequest,
+    session: Session = Depends(get_session),
+) -> CopilotQueryResponse:
+    return answer_copilot_query(payload.message, session)
 
 
 def _run_training_script() -> None:

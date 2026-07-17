@@ -19,7 +19,6 @@ import { apiRequest } from "@/lib/api";
 type DashboardStats = {
   users: number;
   machines: number;
-  reservations: number;
   pendingReservations: number;
 };
 
@@ -145,10 +144,10 @@ function DashboardContent() {
     const loadDashboard = async () => {
       if (!token) return;
       try {
-        const [users, machines, reservations, monitoring, mqtt] = await Promise.all([
+        const [users, machines, reservationCount, monitoring, mqtt] = await Promise.all([
           apiRequest<{ total: number; items: { id: number }[] }>("/admin/users?page=1&page_size=1", { token }),
           apiRequest<{ id: number }[]>("/machines", { token }),
-          apiRequest<{ id: number; status: string }[]>("/admin/reservations", { token }),
+          apiRequest<{ pending_count: number }>("/admin/reservation-stats/pending-count", { token }),
           apiRequest<FleetAssessment>("/admin/ai/monitoring/overview", { token }),
           apiRequest<MQTTStatus>("/monitoring/mqtt/status", { token }),
         ]);
@@ -156,8 +155,7 @@ function DashboardContent() {
         setStats({
           users: users.total,
           machines: machines.length,
-          reservations: reservations.length,
-          pendingReservations: reservations.filter((item) => item.status === "pending").length,
+          pendingReservations: reservationCount.pending_count,
         });
         setOverview(monitoring);
         setMqttStatus(mqtt);

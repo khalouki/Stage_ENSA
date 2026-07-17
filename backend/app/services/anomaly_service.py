@@ -8,6 +8,7 @@ from app.models.machine import Machine
 from app.models.sensor import MachineSensorReading
 from app.schemas.ai import AIAnomalyDetailRead
 from app.schemas.telemetry import MachineStateRead
+from app.services.copilot_localization import copilot_text
 
 
 @dataclass(frozen=True)
@@ -102,7 +103,7 @@ class AnomalyDetectionService:
                     code="temperature_critical",
                     metric="temperature",
                     severity="high",
-                    reason="Temperature entered the critical range for this machine profile.",
+                    reason=copilot_text("anomaly_reason_temperature_critical"),
                     current_value=round(state.temperature, 2),
                     threshold=profile.temp_critical,
                     unit="C",
@@ -114,7 +115,7 @@ class AnomalyDetectionService:
                     code="temperature_drift",
                     metric="temperature",
                     severity="medium",
-                    reason="Temperature is above the usual operating baseline.",
+                    reason=copilot_text("anomaly_reason_temperature_drift"),
                     current_value=round(state.temperature, 2),
                     threshold=round(dynamic_temp_warning, 2),
                     unit="C",
@@ -127,7 +128,7 @@ class AnomalyDetectionService:
                     code="vibration_critical",
                     metric="vibration",
                     severity="high",
-                    reason="Vibration is in a critical band and may indicate mechanical wear.",
+                    reason=copilot_text("anomaly_reason_vibration_critical"),
                     current_value=round(state.vibration, 3),
                     threshold=profile.vibration_critical,
                     unit="mm/s",
@@ -139,7 +140,7 @@ class AnomalyDetectionService:
                     code="vibration_drift",
                     metric="vibration",
                     severity="medium",
-                    reason="Vibration is above the normal band observed in recent telemetry.",
+                    reason=copilot_text("anomaly_reason_vibration_drift"),
                     current_value=round(state.vibration, 3),
                     threshold=round(dynamic_vibration_warning, 3),
                     unit="mm/s",
@@ -152,7 +153,7 @@ class AnomalyDetectionService:
                     code="status_conflict",
                     metric="motor_speed",
                     severity="high",
-                    reason="The machine reports motion while its state is not operational.",
+                    reason=copilot_text("anomaly_reason_status_conflict"),
                     current_value=round(state.motor_speed, 1),
                     threshold=0.0,
                     unit="rpm",
@@ -164,7 +165,7 @@ class AnomalyDetectionService:
                     code="overspeed",
                     metric="motor_speed",
                     severity="medium",
-                    reason="Motor speed is above the safe range for this machine profile.",
+                    reason=copilot_text("anomaly_reason_overspeed"),
                     current_value=round(state.motor_speed, 1),
                     threshold=profile.speed_critical,
                     unit="rpm",
@@ -181,7 +182,7 @@ class AnomalyDetectionService:
                     code="repeated_errors",
                     metric="error",
                     severity="medium" if recent_window_errors < 3 else "high",
-                    reason="Repeated error flags were reported in recent telemetry.",
+                    reason=copilot_text("anomaly_reason_repeated_errors"),
                 )
             )
 
@@ -192,7 +193,7 @@ class AnomalyDetectionService:
                     code="stale_telemetry",
                     metric="telemetry",
                     severity="low",
-                    reason="Telemetry is stale, so the AI assessment may not reflect the current machine state.",
+                    reason=copilot_text("anomaly_reason_stale_telemetry"),
                 )
             )
 

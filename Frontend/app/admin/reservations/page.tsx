@@ -35,6 +35,8 @@ type AdminReservation = {
   note?: string | null;
 };
 
+const RESERVATION_COUNT_REFRESH_EVENT = "reservation-count-refresh";
+
 function AdminReservationsContent() {
   const router = useRouter();
   const { user, token, loading } = useAuth();
@@ -79,6 +81,7 @@ function AdminReservationsContent() {
         showToast({ type: "warning", message: t("adminReservationsRejected") });
       }
       await loadRows();
+      window.dispatchEvent(new Event(RESERVATION_COUNT_REFRESH_EVENT));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("adminReservationsActionFailed"));
       showToast({ type: "error", message: t("adminReservationsUpdateFailed") });
@@ -97,6 +100,7 @@ function AdminReservationsContent() {
       showToast({ type: "success", message: t("adminReservationsDeleted") });
       setReservationToDelete(null);
       await loadRows();
+      window.dispatchEvent(new Event(RESERVATION_COUNT_REFRESH_EVENT));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("adminReservationsDeleteFailed"));
       showToast({ type: "error", message: t("adminReservationsDeleteFailed") });

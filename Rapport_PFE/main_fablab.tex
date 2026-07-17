@@ -99,7 +99,7 @@
 \setlength{\heavyrulewidth}{0.35pt}
 \setlength{\lightrulewidth}{0.18pt}
 \setlength{\cmidrulewidth}{0.18pt}
-\setlength{\arrayrulewidth}{0.2pt}
+\setlength{\arrayrulewidth}{0.35pt}
 \AtBeginEnvironment{table}{%
   \arrayrulecolor{SectionColor!35}%
   \rowcolors{2}{gray!5}{white}%
@@ -129,6 +129,7 @@
 % ─── Boîtes & Cadres ───────────────────────────────────────────────
 \usepackage{tcolorbox}
 \tcbuselibrary{skins}
+\usepackage{tikz}
 
 % ─── Graphiques & Hyperliens ───────────────────────────────────────
 \usepackage{graphicx}
@@ -242,83 +243,125 @@
 \begin{document}
 
 % ─── Page de garde ─────────────────────────────────────────────────
-\newgeometry{hmargin=2cm, top=1.5cm, bottom=1.5cm}
+\newgeometry{hmargin=1.8cm, top=1.35cm, bottom=1.25cm}
 \begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture,overlay]
+  \draw[ChapterColor, line width=1.6pt]
+    ([xshift=1.05cm,yshift=-1.05cm]current page.north west)
+    rectangle
+    ([xshift=-1.05cm,yshift=1.05cm]current page.south east);
+  \draw[ChapterColor, line width=0.55pt]
+    ([xshift=1.28cm,yshift=-1.28cm]current page.north west)
+    rectangle
+    ([xshift=-1.28cm,yshift=1.28cm]current page.south east);
+  \draw[ChapterColor, line width=0.75pt]
+    ([xshift=1.52cm,yshift=-1.05cm]current page.north west) -- ([xshift=2.65cm,yshift=-1.05cm]current page.north west)
+    ([xshift=1.05cm,yshift=-1.52cm]current page.north west) -- ([xshift=1.05cm,yshift=-2.65cm]current page.north west)
+    ([xshift=-1.52cm,yshift=-1.05cm]current page.north east) -- ([xshift=-2.65cm,yshift=-1.05cm]current page.north east)
+    ([xshift=-1.05cm,yshift=-1.52cm]current page.north east) -- ([xshift=-1.05cm,yshift=-2.65cm]current page.north east)
+    ([xshift=1.52cm,yshift=1.05cm]current page.south west) -- ([xshift=2.65cm,yshift=1.05cm]current page.south west)
+    ([xshift=1.05cm,yshift=1.52cm]current page.south west) -- ([xshift=1.05cm,yshift=2.65cm]current page.south west)
+    ([xshift=-1.52cm,yshift=1.05cm]current page.south east) -- ([xshift=-2.65cm,yshift=1.05cm]current page.south east)
+    ([xshift=-1.05cm,yshift=1.52cm]current page.south east) -- ([xshift=-1.05cm,yshift=2.65cm]current page.south east);
+\end{tikzpicture}
 \begin{center}
 
-\begin{tabular}{m{0.25\textwidth} m{0.45\textwidth} m{0.25\textwidth}}
-  \centering\includegraphics[height=2.5cm]{images/univertisé.png} &
+\vspace*{0.2cm}
+
+\begin{tabular}{@{}m{0.22\textwidth} m{0.50\textwidth} m{0.22\textwidth}@{}}
+  \centering\includegraphics[height=2.35cm]{images/univertisé.png} &
   \centering
   \begin{minipage}{\linewidth}
     \centering
-    \text{\small Université Sultan Moulay Slimane}\\[2pt]
-    \text{\small Faculté Polydisciplinaire de Béni Mellal}\\[4pt]
-    \text{Département des technologies nouvelles}
+    {\normalsize\bfseries Université Sultan Moulay Slimane}\\[3pt]
+    {\small Faculté Polydisciplinaire de Béni Mellal}\\[3pt]
+    {\small Département des technologies nouvelles}
   \end{minipage} &
-  \centering\includegraphics[height=2.5cm]{images/Faculté.jpg}
+  \centering\includegraphics[height=2.35cm]{images/Faculté.jpg}
 \end{tabular}
 
-\vspace{3mm}
-\textcolor{RuleColor}{\rule{\linewidth}{1.2pt}}
-\vspace{8mm}
-
-{\Large \textsc{Projet de Fin d'Études}}\\[0.3cm]
-{\small Présenté pour l'obtention du diplôme de}\\[0.2cm]
-{\large \textbf{Master en Data Science et Sécurité des Systèmes d'Information}}\\[0.6cm]
-
-\begin{tcolorbox}[
-  colframe=ChapterColor, colback=ChapterColor!5,
-  arc=3pt, boxrule=1.5pt,
-  center title
-]
-  \centering\Large\bfseries\color{ChapterColor}
-  TITRE : Mise en place d’une plateforme de FabLab virtuel intelligent
-en Industrie 4.0
-\end{tcolorbox}
-
+\vspace{0.35cm}
+\textcolor{RuleColor}{\rule{0.86\linewidth}{0.7pt}}
 \vspace{0.6cm}
 
-\begin{minipage}[t]{0.45\textwidth}
-  \flushleft
+{\Large\bfseries\color{ChapterColor}\MakeUppercase{Projet de Fin d'Études}}\\[0.28cm]
+{\normalsize Présenté pour l'obtention du diplôme de}\\[0.18cm]
+{\large\bfseries Master en Data Science et Sécurité des Systèmes d'Information}\\[0.72cm]
+
+\begin{tcolorbox}[
+  enhanced,
+  width=0.88\textwidth,
+  colframe=ChapterColor,
+  colback=ChapterColor!4,
+  arc=0pt,
+  boxrule=1.1pt,
+  left=8mm,
+  right=8mm,
+  top=5mm,
+  bottom=5mm,
+  center
+]
+  \centering\Large\bfseries\color{ChapterColor}
+  Conception et développement d'une plateforme de FabLab virtuel intelligent intégrant la simulation 3D et le Machine Learning
+\end{tcolorbox}
+
+\vspace{0.62cm}
+
+\begin{minipage}[t]{0.42\textwidth}
+  \raggedright
   \textbf{Présenté par :}\\[4pt]
   M. \textbf{ESSAID ABDELKHALEK}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.45\textwidth}
-  \flushright
+\begin{minipage}[t]{0.42\textwidth}
+  \raggedleft
   \textbf{Sous la direction de :}\\[4pt]
   Pr. \textbf{Soufiane BELHOUIDEG}
 \end{minipage}
 
-\vspace{0.5cm}
+\vspace{0.62cm}
 
 \begin{tcolorbox}[
-  colback=gray!5, colframe=gray!30,
-  arc=5pt, boxrule=0.5pt
+  enhanced,
+  width=0.88\textwidth,
+  colback=white,
+  colframe=ChapterColor!45,
+  arc=0pt,
+  boxrule=0.45pt,
+  left=6mm,
+  right=6mm,
+  top=3mm,
+  bottom=3mm,
+  center
 ]
   \begin{minipage}[c]{0.95\textwidth}
-    \flushleft
-    \textbf{Organisme d'accueil :} \textsc{École Nationale des Sciences Appliquées de Béni Mellal}\\[4pt]
+    \raggedright
+    \small\textbf{Organisme d'accueil :} École Nationale des Sciences Appliquées de Béni Mellal\\[4pt]
     \textit{Cadre : Projet de Fin d'Études -- Virtual FabLab}
   \end{minipage}
 \end{tcolorbox}
 
-\vspace{0.5cm}
+\vspace{0.45cm}
 
-\begin{flushleft}
+\begin{minipage}{0.88\textwidth}
+  \raggedright
   \textbf{Soutenu le :} \textit{À compléter}\\[4pt]
   \textbf{Devant le Jury :}\\[0.2cm]
-  \begin{tabular}{ll}
-    Pr. \textbf{Nom Prénom} & FP Béni Mellal \\[3pt]
-    Pr. \textbf{Nom Prénom} & FP Béni Mellal \\[3pt]
-    Pr. \textbf{Nom Prénom} & FP Béni Mellal \\
+  \begin{tabular}{l}
+    Pr. \textbf{Nom Prénom} --- FP Béni Mellal \\[2pt]
+    Pr. \textbf{Nom Prénom} --- FP Béni Mellal \\[2pt]
+    Pr. \textbf{Nom Prénom} --- FP Béni Mellal \\
   \end{tabular}
-\end{flushleft}
+\end{minipage}
 
 \vfill
 
-\textcolor{gray!50}{\rule{0.3\linewidth}{0.5pt}}\\[0.2cm]
-{\small Faculté Polydisciplinaire -- Université Sultan Moulay Slimane}
+\textcolor{RuleColor}{\rule{0.22\linewidth}{0.45pt}}\hspace{0.45cm}
+{\small\bfseries\color{ChapterColor}2025 -- 2026}
+\hspace{0.45cm}\textcolor{RuleColor}{\rule{0.22\linewidth}{0.45pt}}
+
+\vspace*{0.1cm}
 
 \end{center}
 \end{titlepage}
@@ -329,32 +372,47 @@ en Industrie 4.0
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
+% ── Dédicace ───────────────────────────────────────────────────────
+\chapterstar{Dédicace}
+
+Je dédie ce travail à mes parents, pour leur soutien constant, leurs sacrifices et leurs encouragements tout au long de mon parcours.
+
+À ma famille, pour sa présence, sa compréhension et l'appui qu'elle m'a toujours apporté.
+
+À mes enseignants, pour les connaissances transmises, l'encadrement assuré et la confiance accordée durant ma formation.
+
+À toutes les personnes qui m'ont soutenu, conseillé ou encouragé au cours de mon parcours académique.
+
+Que cette réalisation soit le témoignage de ma reconnaissance envers tous ceux qui ont contribué, de près ou de loin, à mon évolution personnelle et universitaire.
+
 % ── Remerciements ──────────────────────────────────────────────────
 \chapterstar{Remerciements}
 
-Je tiens à exprimer mes sincères remerciements à mon encadrant pédagogique pour son accompagnement, ses conseils et son suivi tout au long de la réalisation de ce projet de fin d'études.
+Je tiens tout d'abord à exprimer ma profonde reconnaissance à mon encadrant pédagogique pour son orientation, ses conseils avisés, sa disponibilité et son soutien continu tout au long de la réalisation de ce projet de fin d'études. Son accompagnement m'a permis de mieux structurer mon travail, d'approfondir ma réflexion et d'avancer avec rigueur dans les différentes étapes de ce projet.
 
-Je remercie également l'ensemble du corps professoral et administratif de l'ENSA Béni Mellal et de l'Université Sultan Moulay Slimane pour la qualité de la formation reçue durant mon parcours académique.
+J'adresse également mes sincères remerciements à l'ensemble du corps professoral et administratif de la Faculté Polydisciplinaire de Béni Mellal (FPBM), pour la qualité de la formation dispensée, l'encadrement assuré et les conditions favorables offertes durant mon parcours académique. Je remercie de même le personnel enseignant et administratif de l'École Nationale des Sciences Appliquées de Béni Mellal (ENSA BM), pour l'accueil, l'accompagnement et les moyens mis à disposition dans le cadre de mon stage et de la réalisation de ce travail.
 
-Enfin, j'adresse mes remerciements à ma famille et à toutes les personnes qui m'ont soutenu directement ou indirectement durant la réalisation de ce travail.
+Mes remerciements s'adressent aussi à l'Université Sultan Moulay Slimane, institution au sein de laquelle s'inscrit cette formation, pour son rôle dans le développement des compétences scientifiques et professionnelles des étudiants. Je tiens également à remercier toutes les personnes ayant contribué, de près ou de loin, au bon déroulement de mon stage et à la réussite de ce projet, par leurs échanges, leurs remarques ou leur soutien.
+
+Enfin, j'exprime toute ma gratitude à ma famille pour son soutien constant, sa patience et ses encouragements tout au long de mon parcours. Que toutes les personnes qui ont contribué directement ou indirectement à l'aboutissement de ce travail trouvent ici l'expression de mes sincères remerciements.
 
 % ── Résumé ────────────────────────────────────────────────────────
 \chapterstar{Résumé}
 
-Ce projet de fin d'études porte sur la conception et le développement d'une plateforme virtuelle de type FabLab intégrant la simulation 3D, l'Internet des Objets et la Data Science. La solution proposée permet de visualiser et de superviser des machines telles qu'une imprimante 3D et une machine CNC dans un environnement interactif.
+Ce projet de fin d'études porte sur la conception et le développement d'une plateforme virtuelle de type FabLab intégrant la simulation 3D, l'Internet des Objets et un module Data Science et Intelligence Artificielle. La solution proposée permet de visualiser et de superviser des machines telles qu'une imprimante 3D et une machine CNC dans un environnement interactif.
 
-La plateforme repose sur une architecture moderne combinant une interface web, un backend applicatif, une simulation 3D, une télémétrie simulée via MQTT et un module d'analyse de données. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
+La plateforme repose sur une architecture moderne combinant une interface web, un backend applicatif, une simulation 3D, une télémétrie simulée via MQTT et un module d'analyse de données. Ce module réalise une détection d'anomalies avec Isolation Forest, une estimation du risque de maintenance avec Random Forest, une classification supervisée des intentions administrateur par TF-IDF et Logistic Regression, ainsi qu'un Copilote IA de maintenance réservé à l'administrateur. Les données de télémétrie utilisées dans cette version sont simulées ; les résultats obtenus doivent donc être interprétés comme une validation de prototype et non comme une validation industrielle.
 
-\textbf{Mots-clés :} FabLab, Industrie 4.0, Simulation 3D, IoT, MQTT, Data Science, Maintenance prédictive, CNC, Imprimante 3D.
+\textbf{Mots-clés :} FabLab, Industrie 4.0, Simulation 3D, IoT, MQTT, Data Science, Isolation Forest, Random Forest, NLP, Copilote IA, CNC, Imprimante 3D.
 
 % ── Abstract ──────────────────────────────────────────────────────
 \chapterstar{Abstract}
 
-This final year project focuses on the design and development of a virtual FabLab platform integrating 3D simulation, Internet of Things technologies and Data Science. The proposed solution enables the visualization and supervision of machines such as a 3D printer and a CNC machine within an interactive environment.
+This final year project focuses on the design and development of a virtual FabLab platform integrating 3D simulation, Internet of Things technologies, Data Science and Artificial Intelligence. The proposed solution enables the visualization and supervision of machines such as a 3D printer and a CNC machine within an interactive environment.
 
-The platform is based on a modern architecture combining a web interface, an application backend, a 3D simulation module, MQTT-simulated telemetry and a data analysis component. In this version, telemetry data is simulated to validate the architecture, MQTT flows, monitoring and analytics module. The platform remains designed for later connection to real sensors.
+The platform is based on a modern architecture combining a web interface, an application backend, a 3D simulation module, MQTT-simulated telemetry and a data analysis component. This component performs anomaly detection using Isolation Forest, maintenance-risk evaluation using Random Forest, supervised administrator-intent classification using TF-IDF and Logistic Regression, and an admin-only AI Maintenance Copilot. In this version, telemetry data is simulated to validate the architecture, MQTT flows, monitoring and analytics module; the results therefore do not constitute industrial validation.
 
-\textbf{Keywords:} FabLab, Industry 4.0, 3D Simulation, IoT, MQTT, Data Science, Predictive Maintenance, CNC, 3D Printer.
+\textbf{Keywords:} FabLab, Industry 4.0, 3D Simulation, IoT, MQTT, Data Science, Isolation Forest, Random Forest, NLP, AI Copilot, CNC, 3D Printer.
 
 % ── Table des matières ────────────────────────────────────────────
 \clearpage
@@ -389,6 +447,9 @@ The platform is based on a modern architecture combining a web interface, an app
   \acro{JWT}{JSON Web Token}
   \acro{JSON}{JavaScript Object Notation}
   \acro{REST}{Representational State Transfer}
+  \acro{NLP}{Natural Language Processing}
+  \acro{TF-IDF}{Term Frequency--Inverse Document Frequency}
+  \acro{LLM}{Large Language Model}
   \acro{UI}{User Interface}
   \acro{UX}{User Experience}
 \end{acronym}
@@ -401,14 +462,15 @@ Les avancées technologiques liées à l'Industrie 4.0 transforment progressivem
 
 Cependant, l'utilisation classique d'un FabLab reste généralement limitée par la présence physique, la disponibilité des machines et l'absence d'outils numériques avancés pour la supervision et l'analyse des données. Dans ce contexte, la mise en place d'une plateforme virtuelle devient une solution pertinente pour améliorer l'accessibilité, la visualisation, la gestion et l'exploitation intelligente des équipements.
 
-Le présent projet vise à concevoir et développer une plateforme virtuelle FabLab intégrant une interface web moderne, une simulation 3D interactive, une communication IoT simulée via MQTT et un module de Data Science destiné à l'analyse des données machines et à la maintenance prédictive. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
+Le présent projet vise à concevoir et développer une plateforme virtuelle FabLab intégrant une interface web moderne, une simulation 3D interactive, une communication IoT simulée via MQTT et un module Data Science et Intelligence Artificielle destiné à l'analyse des données machines et à l'aide à la maintenance. Ce module combine la détection d'anomalies, l'estimation du risque, la classification supervisée d'intentions et un copilote d'aide à la décision réservé à l'administrateur. Les données utilisées dans cette version sont simulées afin de valider l'architecture, les flux MQTT, le monitoring et le module d'analyse. La plateforme reste conçue pour être connectée ultérieurement à des capteurs réels.
 
-Ce rapport est organisé comme suit. Le premier chapitre présente l'organisme d'accueil ainsi que le cadre général du projet, la problématique et les objectifs visés. Le deuxième chapitre est consacré à l'analyse des besoins, à la conception du système et aux technologies utilisées. Le troisième chapitre détaille la réalisation et l'implémentation effective de la plateforme. Enfin, le quatrième chapitre présente la validation fonctionnelle, les résultats obtenus, les limites actuelles et les perspectives d'évolution de la solution.
+Ce rapport est organisé comme suit. Le premier chapitre présente l'organisme d'accueil ainsi que le cadre général du projet, la problématique et les objectifs visés. Le deuxième chapitre est consacré à l'analyse des besoins, à la conception du système et aux technologies utilisées. Le troisième chapitre détaille la réalisation et l'implémentation effective de la plateforme. Le quatrième chapitre présente le module Data Science et Intelligence Artificielle. Enfin, le cinquième chapitre présente la validation fonctionnelle, les résultats obtenus, les limites actuelles et les perspectives d'évolution de la solution.
 
 % ─── Corps du document ─────────────────────────────────────────────
 \include{content/chapter1}
 \include{content/chapter2}
 \include{content/chapter3}
+\include{content/chapter_data_science_ia}
 \include{content/chapter4}
 
 % ─── Conclusion générale ──────────────────────────────────────────
@@ -416,11 +478,11 @@ Ce rapport est organisé comme suit. Le premier chapitre présente l'organisme d
 
 Ce projet de fin d'études avait pour objectif de concevoir et de réaliser une plateforme web de FabLab virtuel intelligent, destinée à faciliter la gestion des machines, la visualisation de l'environnement de fabrication et la supervision des équipements dans un contexte académique.
 
-Les travaux réalisés ont permis de mettre en place une plateforme web fonctionnelle intégrant une simulation 3D du FabLab, un système de communication basé sur le protocole MQTT pour la réception des données de télémétrie, ainsi qu'un module Data Science dédié à l'analyse de l'état des machines. Un tableau de bord administrateur complète la solution en assurant le suivi des équipements, des réservations et des principaux indicateurs de supervision.
+Les travaux réalisés ont permis de mettre en place une plateforme web fonctionnelle intégrant une simulation 3D du FabLab, un système de communication basé sur le protocole MQTT pour la réception des données de télémétrie, une détection d'anomalies, une évaluation du risque de maintenance, une classification supervisée d'intentions et un Copilote IA de maintenance réservé à l'administrateur. Un tableau de bord administrateur complète la solution en assurant le suivi des équipements, des réservations et des principaux indicateurs de supervision.
 
-Dans la version actuelle, les données de télémétrie utilisées sont simulées. Cette approche a permis de valider l'architecture globale de la solution, les flux de communication MQTT, le stockage des données et le fonctionnement du module d'analyse. Elle constitue ainsi une base expérimentale pour une future intégration dans un environnement réel.
+Dans la version actuelle, les données de télémétrie utilisées sont simulées. Cette approche a permis de valider l'architecture globale de la solution, les flux de communication MQTT, le stockage des données et le fonctionnement du module d'analyse. Les résultats obtenus ne constituent donc pas une validation industrielle, mais une base expérimentale pour une future intégration dans un environnement réel.
 
-Les perspectives de ce projet concernent principalement la connexion de la plateforme à des capteurs et à des machines réelles, son déploiement dans un FabLab opérationnel, ainsi que l'exploitation de données réelles pour améliorer et valider les modèles Data Science. Ces évolutions permettraient de renforcer les capacités de supervision intelligente et de faire évoluer la plateforme vers une solution de jumeau numérique plus complète, adaptée aux environnements de fabrication modernes.
+Les perspectives de ce projet concernent principalement la connexion de la plateforme à des capteurs et à des machines réelles, la constitution de jeux de données plus larges, le réentraînement des modèles sur de la télémétrie réelle, l'enrichissement du corpus NLP, le support multilingue, l'amélioration de l'explicabilité, l'intégration optionnelle d'un LLM strictement ancré dans les données et la validation dans un FabLab opérationnel.
 
 % ─── Bibliographie et webographie ─────────────────────────────────
 \clearpage

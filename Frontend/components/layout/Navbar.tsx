@@ -25,6 +25,8 @@ type NavLink = {
   labelKey: TranslationKey;
 };
 
+const RESERVATION_COUNT_REFRESH_EVENT = "reservation-count-refresh";
+
 const publicLinks: NavLink[] = [
   { href: "/", labelKey: "navHome" },
   { href: "/lab", labelKey: "navLab" },
@@ -92,14 +94,27 @@ export default function Navbar() {
         return;
       }
 
-      const path = user.role === "admin" ? "/admin/reservations" : "/reservations/my";
-      const reservations = await apiRequest<Array<{ id: number }>>(path, { token });
-      setReservationCount(reservations.length);
+      try {
+        if (user.role === "admin") {
+          const data = await apiRequest<{ pending_count: number }>("/admin/reservation-stats/pending-count", { token });
+          setReservationCount(data.pending_count);
+          return;
+        }
+
+        const reservations = await apiRequest<Array<{ id: number }>>("/reservations/my", { token });
+        setReservationCount(reservations.length);
+      } catch {
+        setReservationCount(0);
+      }
     };
 
     void loadReservationCount();
+    window.addEventListener(RESERVATION_COUNT_REFRESH_EVENT, loadReservationCount);
     const timer = setInterval(() => void loadReservationCount(), 15000);
-    return () => clearInterval(timer);
+    return () => {
+      window.removeEventListener(RESERVATION_COUNT_REFRESH_EVENT, loadReservationCount);
+      clearInterval(timer);
+    };
   }, [token, user]);
 
   const markAllAsRead = async () => {

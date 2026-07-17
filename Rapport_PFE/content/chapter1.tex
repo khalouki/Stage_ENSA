@@ -94,6 +94,8 @@ Les objectifs spécifiques sont les suivants :
     \item simuler le comportement d’une imprimante 3D et d’une machine CNC à partir de fichiers G-code ou NC ;
     \item intégrer une télémétrie simulée transmise via MQTT ;
     \item analyser les données simulées afin de détecter les anomalies et d’estimer l’état de santé des machines ;
+    \item classifier les intentions administrateur liées à la supervision et à la maintenance ;
+    \item proposer un Copilote IA d’aide à la décision réservé à l’administrateur ;
     \item afficher les indicateurs de supervision dans un tableau de bord administrateur.
 \end{itemize}
 
@@ -111,7 +113,7 @@ La solution réalisée couvre plusieurs modules complémentaires :
     \item un module de visualisation 3D du laboratoire ;
     \item un module de simulation G-code pour imprimante 3D et CNC ;
     \item un module MQTT permettant l’ingestion de télémétrie simulée ;
-    \item un module Data Science pour la détection d’anomalies, le score de santé, l’estimation indicative du risque de panne et les recommandations de maintenance.
+    \item un module Data Science et IA pour la détection d’anomalies, le score de santé, l’estimation indicative du risque de maintenance, la classification d’intentions et le Copilote IA d’aide à la décision.
 \end{itemize}
 
 \begin{figure}[H]

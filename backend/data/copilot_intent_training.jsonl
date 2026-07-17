@@ -1,0 +1,124 @@
+{"text":"Summarize the FabLab activity today","intent":"fablab_summary"}
+{"text":"Give me an overview of the lab","intent":"fablab_summary"}
+{"text":"What is happening in the FabLab right now?","intent":"fablab_summary"}
+{"text":"Show the global machine summary","intent":"fablab_summary"}
+{"text":"Summarize today's activity","intent":"fablab_summary"}
+{"text":"How many machines are normal or critical?","intent":"fablab_summary"}
+{"text":"Overview of telemetry and reservations","intent":"fablab_summary"}
+{"text":"Give me the current fleet summary","intent":"fablab_summary"}
+{"text":"Resume l'activite du FabLab aujourd'hui","intent":"fablab_summary"}
+{"text":"Donne-moi un apercu du laboratoire","intent":"fablab_summary"}
+{"text":"Quel est l'etat global du FabLab ?","intent":"fablab_summary"}
+{"text":"Synthese des machines et reservations","intent":"fablab_summary"}
+{"text":"Donne moi un apercu du FabLab","intent":"fablab_summary"}
+{"text":"Resume le laboratoire et les machines","intent":"fablab_summary"}
+{"text":"Vue globale du FabLab maintenant","intent":"fablab_summary"}
+{"text":"Apercu general des machines du laboratoire","intent":"fablab_summary"}
+{"text":"What is the status of CNC_1?","intent":"machine_status"}
+{"text":"What happened to Printer_1?","intent":"machine_status"}
+{"text":"How is Machine 2 doing?","intent":"machine_status"}
+{"text":"Show current status for the CNC","intent":"machine_status"}
+{"text":"Tell me the latest condition of Printer_1","intent":"machine_status"}
+{"text":"Is CNC_1 available and stable?","intent":"machine_status"}
+{"text":"Current telemetry status for machine 1","intent":"machine_status"}
+{"text":"What is Printer_1 reporting now?","intent":"machine_status"}
+{"text":"Quel est le statut de CNC_1 ?","intent":"machine_status"}
+{"text":"Comment va Printer_1 maintenant ?","intent":"machine_status"}
+{"text":"Donne l'etat actuel de la machine 2","intent":"machine_status"}
+{"text":"Que signale la CNC ?","intent":"machine_status"}
+{"text":"Why is CNC_1 unhealthy?","intent":"explain_machine_health"}
+{"text":"Explain CNC_1 health score","intent":"explain_machine_health"}
+{"text":"Why did the health score drop?","intent":"explain_machine_health"}
+{"text":"Explain the machine health factors","intent":"explain_machine_health"}
+{"text":"Why is Printer_1 in warning?","intent":"explain_machine_health"}
+{"text":"What drives the health score of machine 2?","intent":"explain_machine_health"}
+{"text":"Why is this machine degraded?","intent":"explain_machine_health"}
+{"text":"Explain the unhealthy machine","intent":"explain_machine_health"}
+{"text":"Pourquoi CNC_1 n'est pas saine ?","intent":"explain_machine_health"}
+{"text":"Explique le score de sante de Printer_1","intent":"explain_machine_health"}
+{"text":"Pourquoi le score de sante baisse ?","intent":"explain_machine_health"}
+{"text":"Quels facteurs degradent la machine ?","intent":"explain_machine_health"}
+{"text":"Which machine has the highest risk?","intent":"highest_risk_machine"}
+{"text":"What is the riskiest machine?","intent":"highest_risk_machine"}
+{"text":"Which machine is most unhealthy?","intent":"highest_risk_machine"}
+{"text":"Show the highest maintenance risk","intent":"highest_risk_machine"}
+{"text":"Which machine should I worry about first?","intent":"highest_risk_machine"}
+{"text":"Find the worst machine in the fleet","intent":"highest_risk_machine"}
+{"text":"What machine has the lowest health?","intent":"highest_risk_machine"}
+{"text":"Rank the top risk machine","intent":"highest_risk_machine"}
+{"text":"Quelle machine a le risque le plus eleve ?","intent":"highest_risk_machine"}
+{"text":"Montre la machine la plus risquee","intent":"highest_risk_machine"}
+{"text":"Quelle machine est la moins saine ?","intent":"highest_risk_machine"}
+{"text":"La machine la plus critique laquelle ?","intent":"highest_risk_machine"}
+{"text":"Compare CNC_1 and Printer_1","intent":"compare_machines"}
+{"text":"Compare the two machines","intent":"compare_machines"}
+{"text":"CNC_1 versus Printer_1","intent":"compare_machines"}
+{"text":"Which is healthier, CNC_1 or Printer_1?","intent":"compare_machines"}
+{"text":"Compare risk between machine 1 and machine 2","intent":"compare_machines"}
+{"text":"How do the machines compare?","intent":"compare_machines"}
+{"text":"Compare telemetry for CNC and printer","intent":"compare_machines"}
+{"text":"Show a side by side machine comparison","intent":"compare_machines"}
+{"text":"Compare CNC_1 avec Printer_1","intent":"compare_machines"}
+{"text":"Quelle machine est meilleure entre CNC_1 et Printer_1 ?","intent":"compare_machines"}
+{"text":"Comparaison entre les deux machines","intent":"compare_machines"}
+{"text":"Compare le risque des machines","intent":"compare_machines"}
+{"text":"Show recent anomalies","intent":"recent_anomalies"}
+{"text":"List anomaly alerts","intent":"recent_anomalies"}
+{"text":"Any abnormal telemetry recently?","intent":"recent_anomalies"}
+{"text":"What anomalies happened today?","intent":"recent_anomalies"}
+{"text":"Show warning and critical anomaly signals","intent":"recent_anomalies"}
+{"text":"Which machines have anomalies?","intent":"recent_anomalies"}
+{"text":"Recent abnormal machine behavior","intent":"recent_anomalies"}
+{"text":"Give me anomaly summary","intent":"recent_anomalies"}
+{"text":"Montre les anomalies recentes","intent":"recent_anomalies"}
+{"text":"Y a-t-il des alertes anormales ?","intent":"recent_anomalies"}
+{"text":"Liste les anomalies des machines","intent":"recent_anomalies"}
+{"text":"Quels signaux critiques aujourd'hui ?","intent":"recent_anomalies"}
+{"text":"What maintenance action is recommended?","intent":"maintenance_recommendation"}
+{"text":"Recommend maintenance for CNC_1","intent":"maintenance_recommendation"}
+{"text":"What should the admin inspect?","intent":"maintenance_recommendation"}
+{"text":"Give preventive maintenance advice","intent":"maintenance_recommendation"}
+{"text":"What action should I take for Printer_1?","intent":"maintenance_recommendation"}
+{"text":"Do we need to schedule maintenance?","intent":"maintenance_recommendation"}
+{"text":"What is the recommended intervention?","intent":"maintenance_recommendation"}
+{"text":"Tell me the maintenance priority","intent":"maintenance_recommendation"}
+{"text":"Quelle action de maintenance est recommandee ?","intent":"maintenance_recommendation"}
+{"text":"Recommande une maintenance pour CNC_1","intent":"maintenance_recommendation"}
+{"text":"Que faut-il inspecter ?","intent":"maintenance_recommendation"}
+{"text":"Faut-il planifier une maintenance ?","intent":"maintenance_recommendation"}
+{"text":"Summarize pending reservations","intent":"reservation_summary"}
+{"text":"How many reservations are pending?","intent":"reservation_summary"}
+{"text":"Show today's bookings","intent":"reservation_summary"}
+{"text":"Reservation status summary","intent":"reservation_summary"}
+{"text":"What lab bookings need approval?","intent":"reservation_summary"}
+{"text":"List reservation activity","intent":"reservation_summary"}
+{"text":"Any pending student requests?","intent":"reservation_summary"}
+{"text":"How busy is the reservation queue?","intent":"reservation_summary"}
+{"text":"Resume les reservations en attente","intent":"reservation_summary"}
+{"text":"Combien de reservations sont en attente ?","intent":"reservation_summary"}
+{"text":"Montre les reservations d'aujourd'hui","intent":"reservation_summary"}
+{"text":"Quelles demandes doivent etre approuvees ?","intent":"reservation_summary"}
+{"text":"What can you do?","intent":"help"}
+{"text":"Help me use the copilot","intent":"help"}
+{"text":"Show supported questions","intent":"help"}
+{"text":"What questions can I ask?","intent":"help"}
+{"text":"Copilot capabilities","intent":"help"}
+{"text":"Give me examples","intent":"help"}
+{"text":"How does this assistant work?","intent":"help"}
+{"text":"What do you support?","intent":"help"}
+{"text":"Que peux-tu faire ?","intent":"help"}
+{"text":"Aide-moi avec le copilot","intent":"help"}
+{"text":"Montre les questions possibles","intent":"help"}
+{"text":"Donne des exemples de questions","intent":"help"}
+{"text":"Write a poem about machines","intent":"unknown"}
+{"text":"Delete all reservations","intent":"unknown"}
+{"text":"Run SQL select star from users","intent":"unknown"}
+{"text":"Open a shell command","intent":"unknown"}
+{"text":"What is the weather tomorrow?","intent":"unknown"}
+{"text":"Tell me a joke","intent":"unknown"}
+{"text":"Who won the football match?","intent":"unknown"}
+{"text":"Change my password","intent":"unknown"}
+{"text":"Ecris un poeme","intent":"unknown"}
+{"text":"Supprime toutes les donnees","intent":"unknown"}
+{"text":"Execute une commande SQL","intent":"unknown"}
+{"text":"Quel temps fera-t-il demain ?","intent":"unknown"}
