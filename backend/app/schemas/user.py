@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
+
+from app.core.email import normalize_email
 
 from app.models.user import UserRole
 
@@ -9,6 +11,13 @@ class UserCreate(BaseModel):
     full_name: str
     email: EmailStr
     password: str
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_user_email(cls, value: object) -> object:
+        if isinstance(value, str):
+            return normalize_email(value)
+        return value
 
 
 class UserRead(BaseModel):

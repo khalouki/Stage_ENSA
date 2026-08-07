@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { apiRequest } from "@/lib/api";
+import { normalizeEmail } from "@/lib/auth";
 
 export type UserRole = "student" | "admin";
 
@@ -110,11 +111,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = useCallback(async (payload: RegisterPayload) => {
+    const normalizedEmail = normalizeEmail(payload.email);
     await apiRequest<AuthUser>("/auth/register", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, email: normalizedEmail }),
     });
-    await login({ email: payload.email, password: payload.password });
+    await login({ email: normalizedEmail, password: payload.password });
   }, [login]);
 
   const logout = useCallback(() => {

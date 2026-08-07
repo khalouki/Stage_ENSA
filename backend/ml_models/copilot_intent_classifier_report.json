@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-07-15T15:59:06.570248+00:00",
+  "generated_at": "2026-07-18T11:42:45.873760+00:00",
   "dataset_path": "/home/abdo/Desktop/PFE_Projet/backend/data/copilot_intent_training.jsonl",
   "model_path": "/home/abdo/Desktop/PFE_Projet/backend/ml_models/copilot_intent_classifier.joblib",
   "random_state": 42,
   "split_sizes": {
-    "train": 86,
-    "validation": 19,
-    "test": 19
+    "train": 280,
+    "validation": 60,
+    "test": 60
   },
   "validation": {
-    "accuracy": 0.4211,
-    "precision_macro": 0.4867,
-    "recall_macro": 0.4833,
-    "macro_f1": 0.4486,
+    "accuracy": 0.6833,
+    "precision_macro": 0.7278,
+    "recall_macro": 0.6833,
+    "macro_f1": 0.6793,
     "labels": [
       "compare_machines",
       "explain_machine_health",
@@ -27,33 +27,9 @@
     ],
     "confusion_matrix": [
       [
-        1,
+        5,
         0,
         0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        0,
-        1,
         0,
         0,
         1,
@@ -63,36 +39,60 @@
         0
       ],
       [
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        0
-      ],
-      [
-        0,
-        0,
-        0,
         0,
         2,
         0,
         0,
+        1,
+        3,
+        0,
         0,
         0,
         0
       ],
       [
+        0,
+        0,
+        3,
+        0,
+        0,
         2,
         0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        5,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
         0,
         0,
         0,
         0,
+        6,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        5,
         0,
         0,
         0,
@@ -103,131 +103,131 @@
         0,
         0,
         0,
-        0,
-        0,
         1,
         0,
-        0,
-        0
-      ],
-      [
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0
-      ],
-      [
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
+        4,
         0,
         0,
         1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        4,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        1,
+        3
       ]
     ],
     "classification_report": {
       "compare_machines": {
-        "precision": 0.2,
-        "recall": 0.5,
-        "f1-score": 0.2857142857142857,
-        "support": 2.0
+        "precision": 1.0,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.9090909090909091,
+        "support": 6.0
       },
       "explain_machine_health": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
-        "support": 1.0
+        "precision": 0.6666666666666666,
+        "recall": 0.3333333333333333,
+        "f1-score": 0.4444444444444444,
+        "support": 6.0
       },
       "fablab_summary": {
-        "precision": 0.5,
-        "recall": 0.3333333333333333,
-        "f1-score": 0.4,
-        "support": 3.0
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1-score": 0.6666666666666666,
+        "support": 6.0
       },
       "help": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 2.0
+        "precision": 0.7142857142857143,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.7692307692307693,
+        "support": 6.0
       },
       "highest_risk_machine": {
-        "precision": 0.6666666666666666,
+        "precision": 0.75,
         "recall": 1.0,
-        "f1-score": 0.8,
-        "support": 2.0
+        "f1-score": 0.8571428571428571,
+        "support": 6.0
       },
       "machine_status": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 2.0
+        "precision": 0.45454545454545453,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.5882352941176471,
+        "support": 6.0
       },
       "maintenance_recommendation": {
-        "precision": 0.5,
-        "recall": 1.0,
-        "f1-score": 0.6666666666666666,
-        "support": 1.0
+        "precision": 0.8,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.7272727272727273,
+        "support": 6.0
       },
       "recent_anomalies": {
-        "precision": 1.0,
-        "recall": 0.5,
-        "f1-score": 0.6666666666666666,
-        "support": 2.0
+        "precision": 0.5714285714285714,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.6153846153846154,
+        "support": 6.0
       },
       "reservation_summary": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 2.0
+        "precision": 0.5714285714285714,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.6153846153846154,
+        "support": 6.0
       },
       "unknown": {
-        "precision": 1.0,
+        "precision": 0.75,
         "recall": 0.5,
-        "f1-score": 0.6666666666666666,
-        "support": 2.0
+        "f1-score": 0.6,
+        "support": 6.0
       },
-      "accuracy": 0.42105263157894735,
+      "accuracy": 0.6833333333333333,
       "macro avg": {
-        "precision": 0.48666666666666664,
-        "recall": 0.4833333333333333,
-        "f1-score": 0.44857142857142857,
-        "support": 19.0
+        "precision": 0.7278354978354977,
+        "recall": 0.6833333333333333,
+        "f1-score": 0.6792852898735251,
+        "support": 60.0
       },
       "weighted avg": {
-        "precision": 0.4596491228070175,
-        "recall": 0.42105263157894735,
-        "f1-score": 0.4055137844611529,
-        "support": 19.0
+        "precision": 0.7278354978354978,
+        "recall": 0.6833333333333333,
+        "f1-score": 0.6792852898735252,
+        "support": 60.0
       }
     }
   },
   "test": {
-    "accuracy": 0.4211,
-    "precision_macro": 0.35,
-    "recall_macro": 0.45,
-    "macro_f1": 0.38,
+    "accuracy": 0.8333,
+    "precision_macro": 0.8452,
+    "recall_macro": 0.8333,
+    "macro_f1": 0.8355,
     "labels": [
       "compare_machines",
       "explain_machine_health",
@@ -242,31 +242,7 @@
     ],
     "confusion_matrix": [
       [
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
+        5,
         0,
         1,
         0,
@@ -279,11 +255,35 @@
       ],
       [
         0,
+        5,
         0,
         0,
-        2,
         0,
         0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        5,
+        0,
+        1,
         0,
         0,
         0,
@@ -291,11 +291,23 @@
       ],
       [
         0,
+        0,
+        0,
+        0,
+        6,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
         1,
         0,
         0,
-        1,
         0,
+        0,
+        5,
         0,
         0,
         0,
@@ -308,7 +320,7 @@
         0,
         0,
         1,
-        1,
+        5,
         0,
         0,
         0
@@ -319,10 +331,22 @@
         0,
         0,
         0,
+        0,
+        0,
+        6,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
         1,
         0,
         0,
         0,
+        0,
+        0,
+        4,
         1
       ],
       [
@@ -334,107 +358,83 @@
         0,
         0,
         0,
-        2,
-        0
-      ],
-      [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         1,
-        0
-      ],
-      [
-        0,
-        0,
-        1,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0
+        5
       ]
     ],
     "classification_report": {
       "compare_machines": {
-        "precision": 0.5,
-        "recall": 0.5,
-        "f1-score": 0.5,
-        "support": 2.0
+        "precision": 0.8333333333333334,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.8333333333333334,
+        "support": 6.0
       },
       "explain_machine_health": {
-        "precision": 0.5,
-        "recall": 0.5,
-        "f1-score": 0.5,
-        "support": 2.0
+        "precision": 1.0,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.9090909090909091,
+        "support": 6.0
       },
       "fablab_summary": {
-        "precision": 0.5,
-        "recall": 0.5,
-        "f1-score": 0.5,
-        "support": 2.0
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.6666666666666666,
+        "support": 6.0
       },
       "help": {
         "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
-        "support": 2.0
+        "recall": 0.8333333333333334,
+        "f1-score": 0.9090909090909091,
+        "support": 6.0
       },
       "highest_risk_machine": {
-        "precision": 0.3333333333333333,
-        "recall": 0.5,
-        "f1-score": 0.4,
-        "support": 2.0
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 6.0
       },
       "machine_status": {
-        "precision": 0.3333333333333333,
-        "recall": 0.5,
-        "f1-score": 0.4,
-        "support": 2.0
+        "precision": 0.7142857142857143,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.7692307692307693,
+        "support": 6.0
       },
       "maintenance_recommendation": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 2.0
+        "precision": 1.0,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.9090909090909091,
+        "support": 6.0
       },
       "recent_anomalies": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 2.0
+        "precision": 0.8571428571428571,
+        "recall": 1.0,
+        "f1-score": 0.9230769230769231,
+        "support": 6.0
       },
       "reservation_summary": {
-        "precision": 0.3333333333333333,
-        "recall": 1.0,
-        "f1-score": 0.5,
-        "support": 1.0
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1-score": 0.6666666666666666,
+        "support": 6.0
       },
       "unknown": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 2.0
+        "precision": 0.7142857142857143,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.7692307692307693,
+        "support": 6.0
       },
-      "accuracy": 0.42105263157894735,
+      "accuracy": 0.8333333333333334,
       "macro avg": {
-        "precision": 0.35,
-        "recall": 0.45,
-        "f1-score": 0.38,
-        "support": 19.0
+        "precision": 0.8452380952380952,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.8355477855477856,
+        "support": 60.0
       },
       "weighted avg": {
-        "precision": 0.3508771929824561,
-        "recall": 0.42105263157894735,
-        "f1-score": 0.3736842105263158,
-        "support": 19.0
+        "precision": 0.8452380952380952,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.8355477855477855,
+        "support": 60.0
       }
     }
   }

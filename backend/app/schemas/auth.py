@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+from app.core.email import normalize_email
 
 from app.models.user import UserRole
 
@@ -26,6 +28,13 @@ class AuthUser(BaseModel):
 class ProfileUpdateRequest(BaseModel):
     full_name: str = Field(..., min_length=2, max_length=120)
     email: EmailStr
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_profile_email(cls, value: object) -> object:
+        if isinstance(value, str):
+            return normalize_email(value)
+        return value
 
 
 class PasswordChangeRequest(BaseModel):

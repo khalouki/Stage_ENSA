@@ -23,7 +23,7 @@ Le backend est initialisé dans le point d’entrée FastAPI. Au démarrage, il 
 
 \section{Organisation des dossiers}
 
-Le projet est organisé en trois parties principales : le frontend, le backend et le rapport LaTeX. Cette organisation facilite la maintenance et permet d’isoler les responsabilités.
+Le projet est organisé en deux parties principales : le frontend et le backend. Cette organisation facilite la maintenance et permet d’isoler les responsabilités.
 
 \begin{table}[H]
 \centering
@@ -43,13 +43,23 @@ Le projet est organisé en trois parties principales : le frontend, le backend e
 \hline
 \texttt{backend/app/routes} & Définition des endpoints FastAPI par domaine fonctionnel. \\
 \hline
+\texttt{backend/app/core} & Configuration centrale, sécurité, gestion des paramètres et services techniques partagés. \\
+\hline
 \texttt{backend/app/services} & Logique métier : authentification, machines, réservations, télémétrie, MQTT, anomalies et prédiction. \\
 \hline
 \texttt{backend/app/models} & Modèles SQLModel représentant les entités persistées. \\
 \hline
+\texttt{backend/app/schemas} & Schémas de validation et de sérialisation des données échangées avec l’API. \\
+\hline
+\texttt{backend/data} & Jeux de données utilisés pour la simulation, l’entraînement et la démonstration. \\
+\hline
+\texttt{backend/ml\_models} & Modèles entraînés et métadonnées utilisés par les modules d’analyse et de prédiction. \\
+\hline
 \texttt{backend/scripts} & Scripts de simulation MQTT et d’entraînement des modèles de Machine Learning. \\
 \hline
-\texttt{Rapport\_PFE} & Sources LaTeX du rapport académique. \\
+\texttt{backend/tests} & Tests automatisés couvrant les fonctionnalités backend principales. \\
+\hline
+\texttt{backend/docs} & Documentation technique complémentaire liée aux modules backend. \\
 \hline
 \end{tabular}
 \end{table}
@@ -89,6 +99,8 @@ La persistance est assurée par SQLite avec SQLModel. Les modèles principaux so
 \section{Système d’authentification}
 
 L’authentification est basée sur des jetons JWT. Lorsqu’un utilisateur se connecte, le backend vérifie son email et son mot de passe haché, puis génère un jeton d’accès. Le frontend conserve ce jeton et l’ajoute dans l’en-tête \texttt{Authorization} lors des appels aux routes protégées.
+
+L’inscription publique crée uniquement des comptes étudiants. Elle est limitée aux adresses institutionnelles de l’Université Sultan Moulay Slimane dont le domaine est exactement \texttt{usms.ac.ma}. Cette restriction améliore le contrôle d’accès à l’espace étudiant, mais elle ne constitue pas à elle seule une preuve de possession de l’adresse. Une vérification par lien de confirmation ou par authentification institutionnelle SSO pourra être ajoutée ultérieurement.
 
 Deux rôles sont définis dans le système :
 

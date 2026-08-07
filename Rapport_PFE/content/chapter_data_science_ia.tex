@@ -209,7 +209,7 @@ Côté frontend, le composant \texttt{AiCopilotWidget} vérifie que l'utilisateu
 
 \section{Évaluation et validation}
 
-Les métriques disponibles concernent le classifieur NLP d'intentions. Le fichier de rapport du classifieur indique un jeu de 124 questions étiquetées, séparé en 86 exemples d'entraînement, 19 exemples de validation et 19 exemples de test.
+Les métriques disponibles concernent le classifieur NLP d'intentions. Le fichier de rapport du classifieur indique un jeu enrichi de 400 questions étiquetées, équilibrées sur 10 intentions avec 40 exemples par intention. Ce jeu est séparé en 280 exemples d'entraînement, 60 exemples de validation et 60 exemples de test.
 
 \begin{table}[H]
 \centering
@@ -221,20 +221,20 @@ Les métriques disponibles concernent le classifieur NLP d'intentions. Le fichie
 \rowcolor{SectionColor!12}
 \textbf{Métrique} & \textbf{Validation} & \textbf{Test} \\
 \hline
-Accuracy & 0,4211 & 0,4211 \\
+Accuracy & 0,6833 & 0,8333 \\
 \hline
-Précision macro & 0,4867 & 0,3500 \\
+Précision macro & 0,7278 & 0,8452 \\
 \hline
-Rappel macro & 0,4833 & 0,4500 \\
+Rappel macro & 0,6833 & 0,8333 \\
 \hline
-F1-score macro & 0,4486 & 0,3800 \\
+F1-score macro & 0,6793 & 0,8355 \\
 \hline
-Taille de l'échantillon & 19 & 19 \\
+Taille de l'échantillon & 60 & 60 \\
 \hline
 \end{tabular}
 \end{table}
 
-Ces résultats doivent être interprétés avec prudence, car le jeu de test est réduit. Ils montrent surtout que le pipeline d'évaluation existe et que les métriques sont sauvegardées, mais ils ne suffisent pas pour conclure à une robustesse linguistique élevée.
+Ces résultats doivent être interprétés avec prudence, car le jeu de test reste limité et provient du même corpus annoté. Ils montrent toutefois que l'enrichissement des formulations améliore nettement la classification tout en conservant le même pipeline TF-IDF et Logistic Regression.
 
 L'évaluation actuelle du module Data Science et IA porte principalement sur le comportement en inférence, la cohérence des sorties produites, l'intégration dans la plateforme et les métriques disponibles pour le classifieur NLP. Cette validation permet de vérifier le fonctionnement global du prototype et la bonne exploitation des données simulées. Une validation quantitative plus large, appuyée sur des jeux de test indépendants et sur des données réelles, constitue toutefois une étape complémentaire nécessaire pour apprécier plus finement la robustesse des modèles dans un contexte opérationnel.
 
@@ -252,7 +252,7 @@ Isolation Forest & Chargement du modèle, production du score d'anomalie, tests 
 \hline
 Random Forest & Vérification des variables d'entrée, des classes et des prédictions produites. & Évaluation quantitative sur un jeu de test indépendant et plus large. \\
 \hline
-Classifieur NLP & Accuracy, précision, rappel, F1-score et matrice de confusion. & Enrichissement du corpus, formulations multilingues et validation sur davantage de questions. \\
+Classifieur NLP & Accuracy, précision, rappel, F1-score et matrice de confusion sur le corpus enrichi. & Validation sur un jeu indépendant et davantage de questions réelles. \\
 \hline
 Copilote IA & Tests d'accès administrateur, classification d'intentions, extraction d'entités et génération de réponses fondées sur les données. & Évaluation utilisateur et analyse qualitative des réponses. \\
 \hline
@@ -263,7 +263,7 @@ Copilote IA & Tests d'accès administrateur, classification d'intentions, extrac
 
 Les limites principales du module sont liées à la nature des données et au périmètre du prototype. La télémétrie est simulée, ce qui permet de tester les flux et les interfaces, mais ne remplace pas une collecte issue de capteurs installés sur des machines réelles. Les modèles entraînés ne sont donc pas validés industriellement.
 
-Le jeu de données NLP reste limité et les métriques actuelles montrent une performance modeste sur un petit échantillon de test. Le système fonctionne comme un classifieur d'intentions supervisé, pas comme un agent conversationnel génératif. Les réponses sont déterministes et fondées sur les données disponibles.
+Le jeu de données NLP a été enrichi et équilibré, ce qui améliore les métriques disponibles. Il reste toutefois limité au périmètre des intentions supportées par le backend et doit être consolidé par des questions réelles collectées en usage. Le système fonctionne comme un classifieur d'intentions supervisé, pas comme un agent conversationnel génératif. Les réponses sont déterministes et fondées sur les données disponibles.
 
 Enfin, les recommandations doivent être comprises comme une aide à la décision. Elles distinguent les faits observés, les scores inférés et les actions conseillées, sans prétendre diagnostiquer avec certitude une panne mécanique ou électrique.
 

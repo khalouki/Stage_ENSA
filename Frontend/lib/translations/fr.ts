@@ -133,6 +133,10 @@ export const fr = {
   registerBenefitCollaborate: "Collaborer avec d'autres makers",
   registerBenefitTrack: "Suivre l'avancement de vos projets",
   registerFullName: "Nom complet",
+  registerEmailHint:
+    "Utilisez votre adresse institutionnelle @{domain}. Inscription réservée aux étudiants de l'Université Sultan Moulay Slimane.",
+  registerInstitutionalEmailError:
+    "Veuillez utiliser une adresse électronique institutionnelle valide se terminant par @{domain}.",
   registerFailed: "Échec de l'inscription",
   registerSubmitting: "Création du compte...",
   registerSubmit: "Créer le compte",

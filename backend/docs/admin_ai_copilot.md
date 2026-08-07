@@ -93,7 +93,7 @@ Artifacts:
 - `backend/ml_models/copilot_intent_classifier.joblib`
 - `backend/ml_models/copilot_intent_classifier_report.json`
 
-The current model report is generated from a small MVP dataset, so metrics are useful as a smoke evaluation rather than a production-quality NLP benchmark. The model uses a confidence threshold; low-confidence questions become `unknown` and return supported examples instead of guessing.
+The current model report is generated from an expanded balanced dataset of 400 labeled questions across 10 supported intents. The model uses a confidence threshold; low-confidence questions become `unknown` and return supported examples instead of guessing.
 
 ## Security
 

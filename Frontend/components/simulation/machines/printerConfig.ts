@@ -12,10 +12,10 @@ export const PRINTER_Z_MIN = -1.11;
 export const PRINTER_Z_MAX = 0;
 
 export const PRINTER_HEAD_PARTS = [
-  "Cube.005", "Cube.007", "Cube.017",
-  "Cube.020", "Cube.022", "Cube.024",
+  "Cube.005", "Cube.007", "Cube.017","Cube.021",
+  "Cube.020", "Cube.022","Cube.023", "Cube.024",
   "Cylinder.018", "Cylinder.032", "Cylinder.033",
-  "Cylinder.034", "Cylinder.035", "Sphere.009",
+  "Cylinder.034", "Cylinder.035","Cylinder.037", "Sphere.009",
 ] as const;
 
 export const PRINTER_Z_PARTS = [

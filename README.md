@@ -128,6 +128,15 @@ and exposes monitoring and AI results to the administrator dashboard.
 - Paho MQTT
 - Pandas, NumPy, Scikit-learn, and Joblib
 
+### Authentication and Student Access
+
+Public account registration creates student accounts only. Student registration
+is restricted to institutional Sultan Moulay Slimane University email addresses
+with the exact `@usms.ac.ma` domain, which improves access control for the
+student workspace. This domain check does not prove ownership of the address by
+itself; email confirmation links or institutional SSO can be added later for
+address ownership verification.
+
 ## Project Structure
 
 ```text

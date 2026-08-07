@@ -1,7 +1,9 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlmodel import Session, select
+from sqlmodel import Session, func, select
 
+from app.core.config import settings
+from app.core.email import is_institutional_student_email, normalize_email, normalize_email_for_lookup
 from app.core.security import create_access_token, get_password_hash, safe_decode_token, verify_password
 from app.db import get_session
 from app.models.user import User, UserRole
@@ -12,13 +14,23 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def register_user(payload: UserCreate, session: Session) -> User:
-    existing = session.exec(select(User).where(User.email == payload.email)).first()
+    normalized_email = normalize_email(payload.email)
+    if not is_institutional_student_email(normalized_email):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "L'inscription des étudiants est réservée aux adresses institutionnelles "
+                f"se terminant par @{settings.student_email_domain}."
+            ),
+        )
+
+    existing = session.exec(select(User).where(func.lower(User.email) == normalized_email)).first()
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
 
     user = User(
-        full_name=payload.full_name,
-        email=payload.email,
+        full_name=payload.full_name.strip(),
+        email=normalized_email,
         hashed_password=get_password_hash(payload.password),
         role=UserRole.STUDENT,
         is_active=True,
@@ -30,7 +42,8 @@ def register_user(payload: UserCreate, session: Session) -> User:
 
 
 def login_user(email: str, password: str, session: Session) -> TokenResponse:
-    user = session.exec(select(User).where(User.email == email)).first()
+    normalized_email = normalize_email_for_lookup(email)
+    user = session.exec(select(User).where(func.lower(User.email) == normalized_email)).first()
     if user is None or not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     if not user.is_active:
@@ -41,8 +54,10 @@ def login_user(email: str, password: str, session: Session) -> TokenResponse:
 
 
 def update_current_user_profile(current_user: User, payload: ProfileUpdateRequest, session: Session) -> User:
-    normalized_email = payload.email.strip().lower()
-    existing = session.exec(select(User).where(User.email == normalized_email, User.id != current_user.id)).first()
+    normalized_email = normalize_email(str(payload.email))
+    existing = session.exec(
+        select(User).where(func.lower(User.email) == normalized_email, User.id != current_user.id)
+    ).first()
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
 

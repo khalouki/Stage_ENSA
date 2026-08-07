@@ -8,6 +8,7 @@ import { usePageTransition } from "@/components/app-shell";
 import Image from "next/image"; // Import Image
 import { ScrollReveal } from "@/components/animation";
 import { useTranslation } from "@/components/i18n";
+import { STUDENT_EMAIL_DOMAIN, isInstitutionalStudentEmail, normalizeEmail } from "@/lib/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -20,13 +21,22 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const loadingSpinner = usePageTransition();
+  const normalizedEmail = normalizeEmail(email);
+  const emailDomainError =
+    email.trim().length > 0 && !isInstitutionalStudentEmail(email)
+      ? t("registerInstitutionalEmailError", { domain: STUDENT_EMAIL_DOMAIN })
+      : null;
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    if (emailDomainError) {
+      setError(emailDomainError);
+      return;
+    }
     setLoading(true);
     try {
-      await register({ full_name: fullName, email, password });
+      await register({ full_name: fullName, email: normalizedEmail, password });
       router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("registerFailed"));
@@ -113,12 +123,27 @@ export default function RegisterPage() {
               <label className="block text-sm font-medium mb-1.5">{t("commonEmail")}</label>
               <input
                 type="email"
-                placeholder="name@example.com"
+                placeholder={`nom.prenom@${STUDENT_EMAIL_DOMAIN}`}
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                className="w-full border border-border rounded-lg px-4 py-2.5 bg-background focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setError(null);
+                }}
+                className={`w-full border rounded-lg px-4 py-2.5 bg-background focus:ring-2 outline-none transition-all ${
+                  emailDomainError
+                    ? "border-red-300 focus:ring-red-100"
+                    : "border-border focus:ring-primary/20"
+                }`}
+                aria-describedby="register-email-help"
+                aria-invalid={emailDomainError ? "true" : "false"}
                 required
               />
+              <p id="register-email-help" className="mt-1.5 text-xs text-muted-foreground">
+                {t("registerEmailHint", { domain: STUDENT_EMAIL_DOMAIN })}
+              </p>
+              {emailDomainError && (
+                <p className="mt-1.5 text-xs text-red-600">{emailDomainError}</p>
+              )}
             </div>
 
             <div>
@@ -155,7 +180,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || Boolean(emailDomainError)}
               className="w-full bg-primary text-primary-foreground rounded-lg py-2.5 font-semibold hover:opacity-90 transition-all shadow-sm active:scale-[0.98] disabled:opacity-60"
             >
               {loading ? t("registerSubmitting") : t("registerSubmit")}

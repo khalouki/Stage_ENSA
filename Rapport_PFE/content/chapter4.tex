@@ -93,7 +93,7 @@ Les sorties utilisées par la plateforme comprennent notamment le statut de main
 
 La classification NLP du Copilote IA repose sur un pipeline classique combinant TF-IDF et Logistic Regression. L'objectif de la validation est de vérifier la capacité du classifieur à associer une question administrateur à une intention supportée, sans le présenter comme un modèle génératif ou un grand modèle de langage.
 
-Le fichier d'évaluation disponible indique un corpus de 124 questions étiquetées, séparées en 86 exemples d'entraînement, 19 exemples de validation et 19 exemples de test. Les métriques disponibles sont présentées dans le tableau \ref{tab:validation-nlp-copilot}.
+Le fichier d'évaluation disponible indique un corpus enrichi de 400 questions étiquetées, équilibrées sur 10 intentions avec 40 exemples par intention. Le jeu est séparé en 280 exemples d'entraînement, 60 exemples de validation et 60 exemples de test. Les métriques disponibles sont présentées dans le tableau \ref{tab:validation-nlp-copilot}.
 
 \begin{table}[H]
 \centering
@@ -105,18 +105,18 @@ Le fichier d'évaluation disponible indique un corpus de 124 questions étiquet�
 \rowcolor{SectionColor!12}
 \textbf{Métrique} & \textbf{Validation} & \textbf{Test} \\
 \hline
-Accuracy & 0,4211 & 0,4211 \\
+Accuracy & 0,6833 & 0,8333 \\
 \hline
-Précision macro & 0,4867 & 0,3500 \\
+Précision macro & 0,7278 & 0,8452 \\
 \hline
-Rappel macro & 0,4833 & 0,4500 \\
+Rappel macro & 0,6833 & 0,8333 \\
 \hline
-F1-score macro & 0,4486 & 0,3800 \\
+F1-score macro & 0,6793 & 0,8355 \\
 \hline
 \end{tabular}
 \end{table}
 
-Ces résultats valident l'existence d'une chaîne NLP complète : constitution du corpus, vectorisation, apprentissage, séparation des données, calcul des métriques et matrice de confusion. Les performances restent liées à la taille et à la diversité du corpus ; leur amélioration pourra passer par l'ajout de formulations, de questions multilingues et de scénarios administrateur plus variés.
+Ces résultats valident l'existence d'une chaîne NLP complète : constitution du corpus, vectorisation, apprentissage, séparation des données, calcul des métriques et matrice de confusion. L'enrichissement du corpus améliore nettement les résultats par rapport au jeu initial, tout en conservant la même architecture de classification fondée sur TF-IDF et Logistic Regression. Les performances restent néanmoins liées à la diversité des formulations disponibles et pourront encore être consolidées par un jeu de test plus large et indépendant.
 
 \subsection{Validation du Copilote IA de maintenance}
 
